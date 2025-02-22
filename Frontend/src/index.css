@@ -1,0 +1,46 @@
+*{
+  margin: 0;
+  padding: 0;
+}
+
+.nvm{
+  display: flex;
+  justify-content: center;
+}
+
+.main{
+  display: flex;
+}
+
+.left{
+  margin-top: 10px;
+  width: 50vw;
+}
+
+.left img{
+  width: 100%;  
+}
+
+.right{
+  margin-top: 10px;
+  width: 50vw;
+}
+
+.cardMine{
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 5px;
+  margin: 10px;
+}
+
+.card{
+  height: 400px;
+}
+
+.card img{
+  height: 250px;
+}
+
+.card :hover{
+  transform: scale(5px, 5px);
+}
