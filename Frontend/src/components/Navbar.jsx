@@ -1,4 +1,6 @@
 import React, { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
+
 
 function Navbar() {
   const[sticky, setSticky] = useState(false);
@@ -32,9 +34,9 @@ function Navbar() {
             >
               <span className="navbar-toggler-icon"></span>
             </button>
-            <a className="navbar-brand order-1 ms-3 agbalumo-regular d-flex align-items-center" href="#">
+            <Link className="navbar-brand order-1 ms-3 agbalumo-regular d-flex align-items-center" to="/">
               ReFina
-            </a>
+            </Link>
           </div>
 
           <div
@@ -44,19 +46,19 @@ function Navbar() {
             <div className="ln">
               <ul className="navbar-nav me-auto mb-2 mb-lg-0 ">
                 <li className="nav-item">
-                  <a className="nav-link active" aria-current="page" href="#">
+                  <Link className="nav-link active" aria-current="page" to="/">
                     Home
-                  </a>
+                  </Link>
                 </li>
                 <li className="nav-item">
-                  <a className="nav-link active" aria-current="page" href="#">
+                  <Link className="nav-link active" aria-current="page" to="/about">
                     About
-                  </a>
+                  </Link>
                 </li>
                 <li className="nav-item">
-                  <a className="nav-link active" aria-current="page" href="#">
+                  <Link className="nav-link active" aria-current="page" to="/contact">
                     Contact Us
-                  </a>
+                  </Link>
                 </li>
               </ul>
             </div>
