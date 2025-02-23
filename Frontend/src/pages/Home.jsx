@@ -23,7 +23,7 @@ function Home() {
       </div>
       <div className="ftr">
         <h1 className="signika-negative-regular"> Why Choose Us?</h1>
-        <div className="cf">
+        <div>
           <FeatureCard />
         </div>
       </div>

@@ -4,7 +4,7 @@ function Footer() {
   return (
     <>
       <footer className="foot text-center text-lg-start">
-        <div className="text-center p-3">© 2025 Copyright: Finage.com</div>
+        <div className="text-center p-3">© 2025 Copyright: ReFina.com</div>
       </footer>
     </>
   );
