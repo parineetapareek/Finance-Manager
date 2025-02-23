@@ -45,7 +45,7 @@ function FeatureCard() {
               alt={feature.title}
             />
             <div className="card-body">
-              <h2>{feature.title}</h2>
+              <h2 className="cormorant-infant-medium">{feature.title}</h2>
               <p className="card-text">{feature.description} </p>
             </div>
           </div>

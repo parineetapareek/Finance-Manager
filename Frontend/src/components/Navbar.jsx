@@ -1,24 +1,41 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 
 function Navbar() {
+  const[sticky, setSticky] = useState(false);
+  useEffect(()=>{
+    const handleScroll = () => {
+      if (window.scrollY>0){
+        setSticky(true);
+      }else{
+        setSticky(false);
+      }
+    };
+    window.addEventListener("scroll", handleScroll);
+    return()=>{
+      window.removeEventListener("scroll", handleScroll);
+    };
+  }, []);
+
   return (
     <>
-      <nav className="navbar navbar-expand-lg bg-body-tertiary">
-        <div className="container-fluid">
-          <a className="navbar-brand" href="#">
-            Finage
-          </a>
-          <button
-            className="navbar-toggler"
-            type="button"
-            data-bs-toggle="collapse"
-            data-bs-target="#navbarSupportedContent"
-            aria-controls="navbarSupportedContent"
-            aria-expanded="false"
-            aria-label="Toggle navigation"
-          >
-            <span className="navbar-toggler-icon"></span>
-          </button>
+      <nav className={`navbar navbar-expand-lg ${sticky ? "fixed-top shadow bg-light text-dark transition-all duration-300":""}`}>
+        <div className="container-fluid d-flex justify-content-between w-100">
+          <div className="d-flex align-items-center ">
+            <button
+              className="navbar-toggler ms-2 order-0"
+              type="button"
+              data-bs-toggle="collapse"
+              data-bs-target="#navbarSupportedContent"
+              aria-controls="navbarSupportedContent"
+              aria-expanded="false"
+              aria-label="Toggle navigation"
+            >
+              <span className="navbar-toggler-icon"></span>
+            </button>
+            <a className="navbar-brand order-1 ms-3 agbalumo-regular d-flex align-items-center" href="#">
+              ReFina
+            </a>
+          </div>
 
           <div
             className="collapse navbar-collapse nvm"
