@@ -1,6 +1,8 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 
 function About() {
+  const navigate = useNavigate();
   return (
     <>
       <div className="about">
@@ -38,7 +40,7 @@ function About() {
 
         <div className="abtCard">
           <div className="cimgL">
-            <img src="abt3.png"/>
+            <img src="abt3.png" />
           </div>
           <div className="contentR">
             <h1>What Makes Us Different?</h1>
@@ -74,13 +76,13 @@ function About() {
             </p>
           </div>
           <div className="cimgR">
-            <img src="abt4.png"/>
+            <img src="abt4.png" />
           </div>
         </div>
 
         <div className="abtCard">
           <div className="cimgL">
-            <img src="abt5.png"/>
+            <img src="abt5.png" />
           </div>
           <div className="contentR">
             <h1>Shape the Future of Finance Management</h1>
@@ -91,17 +93,13 @@ function About() {
               free to reach out. Together, we can make personal finance simpler
               for everyone.
             </p>
-            <button
-              type="button"
-              className="btn"
-              style={{ border: "2px solid #CE93D8", color: "#CE93D8" }}
-            >
+            <button type="button" className="btn">
               Get Started
             </button>
             <button
               type="button"
               className="btn"
-              style={{ border: "2px solid #CE93D8", color: "#CE93D8" }}
+              onClick={() => navigate("/contact")}
             >
               Contact Us
             </button>

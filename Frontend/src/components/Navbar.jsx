@@ -1,26 +1,34 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-
+import AuthModal from "./AuthModal";
 
 function Navbar() {
-  const[sticky, setSticky] = useState(false);
-  useEffect(()=>{
+  const [sticky, setSticky] = useState(false);
+  useEffect(() => {
     const handleScroll = () => {
-      if (window.scrollY>0){
+      if (window.scrollY > 0) {
         setSticky(true);
-      }else{
+      } else {
         setSticky(false);
       }
     };
     window.addEventListener("scroll", handleScroll);
-    return()=>{
+    return () => {
       window.removeEventListener("scroll", handleScroll);
     };
   }, []);
 
+  const [modalOpen, setModalOpen] = useState(false);
+
   return (
     <>
-      <nav className={`navbar navbar-expand-lg ${sticky ? "fixed-top shadow bg-light text-dark transition-all duration-300":""}`}>
+      <nav
+        className={`navbar navbar-expand-lg ${
+          sticky
+            ? "fixed-top shadow bg-light text-dark transition-all duration-300"
+            : ""
+        }`}
+      >
         <div className="container-fluid d-flex justify-content-between w-100">
           <div className="d-flex align-items-center ">
             <button
@@ -34,7 +42,10 @@ function Navbar() {
             >
               <span className="navbar-toggler-icon"></span>
             </button>
-            <Link className="navbar-brand order-1 ms-3 agbalumo-regular d-flex align-items-center" to="/">
+            <Link
+              className="navbar-brand order-1 ms-3 agbalumo-regular d-flex align-items-center"
+              to="/"
+            >
               ReFina
             </Link>
           </div>
@@ -51,21 +62,34 @@ function Navbar() {
                   </Link>
                 </li>
                 <li className="nav-item">
-                  <Link className="nav-link active" aria-current="page" to="/about">
+                  <Link
+                    className="nav-link active"
+                    aria-current="page"
+                    to="/about"
+                  >
                     About
                   </Link>
                 </li>
                 <li className="nav-item">
-                  <Link className="nav-link active" aria-current="page" to="/contact">
+                  <Link
+                    className="nav-link active"
+                    aria-current="page"
+                    to="/contact"
+                  >
                     Contact Us
                   </Link>
                 </li>
               </ul>
             </div>
           </div>
-          <button type="button" className="btn btn-outline-dark">
+          <button
+            onClick={() => setModalOpen(true)}
+            type="button"
+            className="btn btn-outline-dark"
+          >
             Sign Up
           </button>
+          <AuthModal isOpen={modalOpen} onClose={() => setModalOpen(false)} />
         </div>
       </nav>
     </>
