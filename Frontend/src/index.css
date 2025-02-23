@@ -187,3 +187,63 @@ body{
   gap: 20px;
   padding: 20px;
 }
+
+/* Contact US Styling  */
+.contactP {
+  height: 80vh;
+  max-width: 500px;
+  margin: auto;
+  padding: 20px;
+  text-align: center;
+}
+
+.contactForm {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.contactForm input,
+.contactForm select,
+.contactForm textarea {
+  width: 100%;
+  padding: 8px 0;
+  font-size: 1rem;
+  border: none;
+  border-bottom: 2px solid #9C27B0; 
+  outline: none;
+  background: transparent;
+  transition: border-color 0.3s ease-in-out;
+}
+
+.contactForm input:focus,
+.contactForm select:focus,
+.contactForm textarea:focus {
+  border-bottom: 2px solid #FFB300; 
+}
+
+.contactForm textarea {
+  min-height: 100px;
+  resize: none;
+}
+
+.contactForm button {
+  padding: 10px;
+  font-size: medium;
+  font-weight: 700;
+  background-color: #9C27B0;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: 0.3s ease-in-out;
+}
+
+.contactForm button:hover {
+  background-color: #7B1FA2;
+}
+
+.error {
+  color: red;
+  font-size: 0.8rem;
+}
