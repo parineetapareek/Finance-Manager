@@ -1,8 +1,11 @@
-import React from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import AuthModal from "../components/AuthModal";
 
 function About() {
   const navigate = useNavigate();
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+
   return (
     <>
       <div className="about">
@@ -93,9 +96,15 @@ function About() {
               free to reach out. Together, we can make personal finance simpler
               for everyone.
             </p>
-            <button type="button" className="btn">
+
+            <button
+              type="button"
+              className="btn"
+              onClick={() => setIsAuthModalOpen(true)}
+            >
               Get Started
             </button>
+
             <button
               type="button"
               className="btn"
@@ -106,6 +115,11 @@ function About() {
           </div>
         </div>
       </div>
+
+      <AuthModal
+        isOpen={isAuthModalOpen}
+        onClose={() => setIsAuthModalOpen(false)}
+      />
     </>
   );
 }

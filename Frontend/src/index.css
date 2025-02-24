@@ -9,6 +9,19 @@
   box-sizing: border-box;
 }
 
+/* Button Styling  */
+.btn{
+  border: 2px solid #CE93D8; 
+  color: #CE93D8 ;
+  
+}
+
+.btn:hover{
+  background-color: #9C27B0;
+  color: white;
+  transform: scale(1.05);
+}
+
 /* Logo Font */
 .agbalumo-regular {
   font-family: "Agbalumo", serif;

@@ -36,8 +36,8 @@ function AuthModal({ isOpen, onClose }) {
 
   return (
     isOpen && (
-      <div className="modal-overlay">
-        <div className="modal-content">
+      <div className="modal-overlay" onClick={onClose}>
+        <div className="modal-content"  onClick={(e)=>e.stopPropagation()}>
           <button className="close-btn" onClick={onClose}>
             ×
           </button>
