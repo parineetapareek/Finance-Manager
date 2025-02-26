@@ -3,6 +3,7 @@ import dotenv from 'dotenv';
 import cors from 'cors';
 import connectDB from './config/db.js';
 import routes from './routes/index.js'
+import authRoute from './routes/auth.route.js';
 
 dotenv.config();
 
@@ -18,6 +19,7 @@ connectDB();
 
 // Routes 
 app.use('/',routes);
+app.use('/auth',authRoute);
 
 // Start Server 
 app.listen(port, () => {
