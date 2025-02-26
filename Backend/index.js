@@ -1,29 +1,25 @@
-import express from 'express';
-import mongoose from 'mongoose';
+import express from 'express'
 import dotenv from 'dotenv';
 import cors from 'cors';
+import connectDB from './config/db.js';
+import routes from './routes/index.js'
+
+dotenv.config();
 
 const app = express();
 const port = 3000;
  
+// Middleware 
 app.use(express.json());
 app.use(cors());
 
-dotenv.config();
+// Database Connection 
+connectDB();
 
-mongoose
-    .connect(process.env.MONGO)
-    .then(()=>{
-        console.log("Connected to MongoDB");
-    })
-    .catch((err)=>{
-        console.error(err);
-    });
+// Routes 
+app.use('/',routes);
 
-app.get('/', (req, res) => {
-  res.send('Hello World')
-})
-
+// Start Server 
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`)
-})
+});
