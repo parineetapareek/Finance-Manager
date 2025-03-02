@@ -8,19 +8,32 @@ import {
   signup,
   verifyEmail,
 } from "../controllers/auth.controller.js";
-// import {
-//   loginValidation,
-//   signupValidation,
-// } from "../middlewares/auth.validation.js";
+import {
+  emailValidation,
+  loginValidation,
+  resendVerificationEmailValidation,
+  resetPasswordValidation,
+  sendResetPassCodeValidation,
+  signupValidation,
+  verifyEmailValidation,
+} from "../middlewares/auth.validation.js";
 
 const authRoute = express.Router();
 
-authRoute.post("/signup", signup);
-authRoute.post("/login", login);
-authRoute.post("/logout", logout);
-authRoute.post("/verifyEmail", verifyEmail);
-authRoute.post("/resendCode", resendVerificationEmail);
-authRoute.post("/resetPass",resetPassword);
-authRoute.post("/sendResetPassCode",sendResetPassCode);
+authRoute.post("/signup", signupValidation, signup);
+authRoute.post("/login", loginValidation, login);
+authRoute.post("/logout", emailValidation, logout);
+authRoute.post("/verifyEmail", verifyEmailValidation, verifyEmail);
+authRoute.post(
+  "/resendCode",
+  resendVerificationEmailValidation,
+  resendVerificationEmail
+);
+authRoute.post(
+  "/sendResetPassCode",
+  sendResetPassCodeValidation,
+  sendResetPassCode
+);
+authRoute.post("/resetPass", resetPasswordValidation, resetPassword);
 
 export default authRoute;

@@ -10,17 +10,22 @@ import User from "../models/user.model.js";
 dotenv.config();
 
 const JWT_SECRET = process.env.JWT_SECRET;
-console.log("JWT_SECRET: ", JWT_SECRET);
+
+// Utility Function to Generate OTP
+const generateOTP = async () => {
+  const otp = Math.floor(100000 + Math.random() * 900000).toString();
+  const hashOTP = await bcrypt.hash(otp, 10);
+  return { otp, hashOTP };
+};
+
+// Utility Function to Generate JWT Token
+const generateJWTToken = (userId, email) => {
+  return jwt.sign({ userId, email }, JWT_SECRET, { expiresIn: "7d" });
+};
 
 export const signup = async (req, res) => {
   try {
     const { name, email, password } = req.body;
-
-    if (!name || !email || !password) {
-      return res
-        .status(400)
-        .json({ success: false, message: "All Fields are required!" });
-    }
 
     const existingUser = await User.findOne({ email });
     if (existingUser) {
@@ -31,10 +36,7 @@ export const signup = async (req, res) => {
 
     const hashPassword = await bcrypt.hash(password, 10);
 
-    // Generate OTP
-    const otp = Math.floor(100000 + Math.random() * 900000).toString();
-
-    const hashOTP = await bcrypt.hash(otp, 10);
+    const { otp, hashOTP } = await generateOTP();
 
     await sendVerificationCode(email, otp);
 
@@ -66,17 +68,18 @@ export const login = async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    if (!email || !password) {
-      return res
-        .status(400)
-        .json({ success: false, message: "All Fields are required!" });
-    }
-
     const existingUser = await User.findOne({ email });
     if (!existingUser) {
       return res.status(403).json({
         success: false,
         message: "User Does Not Exist! Please Signup",
+      });
+    }
+
+    if (!existingUser.isVerified) {
+      return res.status(403).json({
+        success: false,
+        message: "Please Verify your Email to Login!",
       });
     }
 
@@ -87,22 +90,17 @@ export const login = async (req, res) => {
         .json({ success: false, message: "Invalid Password!" });
     }
 
-    if (!existingUser.isVerified) {
-      return res.status(403).json({
-        success: false,
-        message: "Please Verify your Email to Login!",
-      });
-    }
-
     // JWT Session Management
-    const token = jwt.sign(
-      {
-        id: existingUser._id,
-        email: existingUser.email,
-      },
-      process.env.JWT_SECRET,
-      { expiresIn: "7d" }
-    );
+    // const token = jwt.sign(
+    //   {
+    //     id: existingUser._id,
+    //     email: existingUser.email,
+    //   },
+    //   process.env.JWT_SECRET,
+    //   { expiresIn: "7d" }
+    // );
+
+    const token = generateJWTToken(existingUser._id, existingUser.email);
 
     res.cookie("token", token, {
       httpOnly: true,
@@ -186,17 +184,17 @@ export const verifyEmail = async (req, res) => {
     await sendWelcomeEmail(user.email, user.name);
 
     // Generate JWT Token after successful verification
-    const token = jwt.sign(
-      { userId: user._id, email: user.email },
-      process.env.JWT_SECRET,
-      { expiresIn: "7d" }
-    );
+    // const token = jwt.sign(
+    //   { userId: user._id, email: user.email },
+    //   process.env.JWT_SECRET,
+    //   { expiresIn: "7d" }
+    // );
 
-    res.cookie("token", token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "strict",
-    });
+    // res.cookie("token", token, {
+    //   httpOnly: true,
+    //   secure: process.env.NODE_ENV === "production",
+    //   sameSite: "strict",
+    // });
 
     return res
       .status(200)
@@ -213,12 +211,6 @@ export const resendVerificationEmail = async (req, res) => {
   try {
     const { email } = req.body;
 
-    if (!email) {
-      return res
-        .status(400)
-        .json({ success: false, message: "Email is required!" });
-    }
-
     const user = await User.findOne({ email });
     if (!user) {
       return res
@@ -232,10 +224,7 @@ export const resendVerificationEmail = async (req, res) => {
         .json({ success: false, message: "Email Already Verified!" });
     }
 
-    // Generate New OTP
-    const otp = Math.floor(100000 + Math.random() * 900000).toString();
-
-    const hashOTP = await bcrypt.hash(otp, 10);
+    const { otp, hashOTP } = await generateOTP();
 
     user.verificationCode = hashOTP;
     user.verificationExpires = Date.now() + 10 * 60 * 1000;
@@ -259,11 +248,6 @@ export const resendVerificationEmail = async (req, res) => {
 export const sendResetPassCode = async (req, res) => {
   try {
     const { email } = req.body;
-    if (!email) {
-      return res
-        .status(400)
-        .json({ success: false, message: "Email is Required!" });
-    }
 
     const user = await User.findOne({ email });
     if (!user) {
@@ -276,13 +260,11 @@ export const sendResetPassCode = async (req, res) => {
         .json({ success: false, message: "Email Not Verified!" });
     }
 
-    const resetPassCode = Math.floor(
-      100000 + Math.random() * 900000
-    ).toString();
-    const hashResetPassCode = await bcrypt.hash(resetPassCode, 10);
-    sendVerificationCode(email, resetPassCode);
+    const { otp, hashOTP } = await generateOTP();
 
-    user.resetCode = hashResetPassCode;
+    sendVerificationCode(email, otp);
+
+    user.resetCode = hashOTP;
     user.resetCodeExpires = Date.now() + 10 * 60 * 1000; //10 min
     await user.save();
 
@@ -302,13 +284,6 @@ export const sendResetPassCode = async (req, res) => {
 export const resetPassword = async (req, res) => {
   try {
     const { code, email, newPass } = req.body;
-    console.log(req.body);
-
-    if (!code) {
-      return res
-        .status(400)
-        .json({ success: false, message: "Code is Required!" });
-    }
 
     const user = await User.findOne({ email });
     console.log(user);
