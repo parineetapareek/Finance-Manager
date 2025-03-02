@@ -255,3 +255,102 @@ export const resendVerificationEmail = async (req, res) => {
       .json({ success: false, message: "An Error Occured!" });
   }
 };
+
+export const sendResetPassCode = async (req, res) => {
+  try {
+    const { email } = req.body;
+    if (!email) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Email is Required!" });
+    }
+
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res
+        .status(403)
+        .json({ success: false, message: "User Not Found!" });
+    } else if (!user.isVerified) {
+      return res
+        .status(403)
+        .json({ success: false, message: "Email Not Verified!" });
+    }
+
+    const resetPassCode = Math.floor(
+      100000 + Math.random() * 900000
+    ).toString();
+    const hashResetPassCode = await bcrypt.hash(resetPassCode, 10);
+    sendVerificationCode(email, resetPassCode);
+
+    user.resetCode = hashResetPassCode;
+    user.resetCodeExpires = Date.now() + 10 * 60 * 1000; //10 min
+    await user.save();
+
+    return res.status(200).json({
+      success: true,
+      message:
+        "Reset Password Code Sent Successfully! Please Check your Inbox!",
+    });
+  } catch (error) {
+    console.error("Error Sending Password Reset Link: ", error);
+    return res
+      .status(500)
+      .json({ success: false, message: "An Error Occured" });
+  }
+};
+
+export const resetPassword = async (req, res) => {
+  try {
+    const { code, email, newPass } = req.body;
+    console.log(req.body);
+
+    if (!code) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Code is Required!" });
+    }
+
+    const user = await User.findOne({ email });
+    console.log(user);
+
+    if (!user) {
+      return res
+        .status(400)
+        .json({ success: false, message: "User Does Not Exists!" });
+    } else if (user.resetCodeExpires < Date.now()) {
+      return res.status(403).json({
+        success: false,
+        message: "OTP Expired, Please Request a New One!",
+      });
+    }
+
+    const isMatch = await bcrypt.compare(code, user.resetCode);
+    if (!isMatch) {
+      return res.status(403).json({ success: false, message: "Invalid OTP!" });
+    }
+
+    const hashNewPass = await bcrypt.hash(newPass, 10);
+
+    const isDiff = await bcrypt.compare(newPass, user.password);
+    if (isDiff) {
+      return res.status(403).json({
+        success: false,
+        message: "Old Password and New Password cant be same!",
+      });
+    }
+
+    user.password = hashNewPass;
+    user.resetCode = undefined;
+    user.resetCodeExpires = undefined;
+    await user.save();
+
+    return res
+      .status(200)
+      .json({ success: true, message: "Password Changed Successfully!" });
+  } catch (error) {
+    console.error("Error Resetting Password!", error);
+    return res
+      .status(500)
+      .json({ success: false, message: "An Error Occurred!" });
+  }
+};
