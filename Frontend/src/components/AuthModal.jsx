@@ -1,13 +1,27 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import { AppContent } from "../context/AppContext";
+import { login, signup } from "../services/AuthService";
 
 function AuthModal({ isOpen, onClose }) {
   const [isSignup, setIsSignup] = useState(true);
-  const [formData, setFormData] = useState({ email: "", password: "" });
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    password: "",
+  });
   const [errors, setErrors] = useState({});
+  const [loading, setLoading] = useState(false);
+
+  const navigate = useNavigate();
+
+  const { setIsLoggedIn, setUserData } = useContext(AppContent);
 
   const toggleForm = () => {
     setIsSignup(!isSignup);
-    setFormData({ email: "", password: "" });
+    setFormData({ name: "", email: "", password: "" });
     setErrors({});
   };
 
@@ -15,29 +29,56 @@ function AuthModal({ isOpen, onClose }) {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    let newErrors = {};
+    setLoading(true);
+    setErrors({}); //Clear Previous errors
 
-    if (!formData.email) newErrors.email = "Email is required";
-    if (!formData.password) newErrors.password = "Password is required";
+    try {
+      const response = isSignup
+        ? await signup(formData)
+        : await login(formData);
 
-    if (isSignup && !formData.name) newErrors.name = "Name is required";
-    if (isSignup && formData.password.length < 6)
-      newErrors.password = "Password must be at least 6 characters";
+      if (isSignup) {
+        toast.success("Signup Successful! Please Verify your Email!");
+        onClose();
+        navigate(`/verify?email=${formData.email}`);
+      } else {
+        setIsLoggedIn(true);
+        setUserData(response.user);
+        toast.success("Login successful!");
+        onClose();
+      }
+    } catch (error) {
+      if (error.response && error.response.data.errors) {
+        const newErrors = {};
+        error.response.data.errors.forEach((msg) => {
+          if (msg.toLowerCase().includes("name")) newErrors.name = msg;
+          if (msg.toLowerCase().includes("email")) newErrors.email = msg;
+          if (msg.toLowerCase().includes("password")) newErrors.password = msg;
+        });
 
-    setErrors(newErrors);
+        setErrors(newErrors);
+        toast.error("Validation error! Check your inputs!");
+      } else {
+        setErrors({ message: error.message || "Something went wrong" });
+        toast.error(error.message || "Something went wrong");
+      }
 
-    if (Object.keys(newErrors).length === 0) {
-      alert(`${isSignup ? "Signup" : "Login"} successful!`);
-      onClose();
+      setFormData({ name: "", email: "", password: "" });
+
+      setTimeout(() => {
+        window.location.reload();
+      }, 3000);
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
     isOpen && (
       <div className="modal-overlay" onClick={onClose}>
-        <div className="modal-content"  onClick={(e)=>e.stopPropagation()}>
+        <div className="modal-content" onClick={(e) => e.stopPropagation()}>
           <button className="close-btn" onClick={onClose}>
             ×
           </button>
@@ -75,7 +116,17 @@ function AuthModal({ isOpen, onClose }) {
               <span className="error">{errors.password}</span>
             )}
 
-            <button type="submit">{isSignup ? "Sign Up" : "Login"}</button>
+            {!isSignup && (
+              <p className="fpass" onClick={() => navigate("/forgetPassword")}>
+                <span>Forgot Password?</span>
+              </p>
+            )}
+
+            <button type="submit" disabled={loading}>
+              {loading ? "Processing..." : isSignup ? "Sign Up" : "Login"}
+            </button>
+
+            {errors.message && <span className="error">{errors.message}</span>}
           </form>
 
           <p className="toggle-text">

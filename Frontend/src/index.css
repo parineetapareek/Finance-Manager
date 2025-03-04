@@ -367,3 +367,52 @@ body {
   cursor: pointer;
   text-decoration: underline;
 }
+
+/* Verify Account Page Styling  */
+.verifyContainer{
+  display:flex;
+  flex-direction: column;
+  height: 80vh;
+  justify-content: center;
+  align-items: center; 
+}
+
+.mainVerify{
+  max-width: 500px;
+  height: 250px;
+  border: 1px solid black;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+}
+
+.mainVerify input{
+  width: 80%;
+  border: none;
+  border-bottom: 2px solid #9C27B0;
+  outline: none;
+  background: transparent;
+  margin: 10px;
+}
+
+.mainVerify input:focus {
+  border-bottom: 2px solid #ffb300;
+}
+
+.mainVerify button{
+  padding: 5px;
+  background-color: #9c27b0;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: 0.3s ease-in-out;
+}
+
+.mainVerify button:hover {
+  background-color: #7b1fa2;
+}

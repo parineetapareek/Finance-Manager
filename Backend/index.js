@@ -14,7 +14,12 @@ const port = 3000;
 // Middleware
 app.use(express.json());
 app.use(cookieParser());
-app.use(cors({ credentials: true }));
+app.use(
+  cors({
+    origin: process.env.FRONTEND_URL,
+    credentials: true,
+  })
+);
 
 // Database Connection
 connectDB();

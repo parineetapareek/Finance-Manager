@@ -1,15 +1,16 @@
 import bcrypt from "bcryptjs";
-import jwt from "jsonwebtoken";
-import dotenv from "dotenv";
+// import jwt from "jsonwebtoken";
+// import dotenv from "dotenv";
 import {
   sendVerificationCode,
   sendWelcomeEmail,
 } from "../middlewares/email.js";
 import User from "../models/user.model.js";
+import { generateJWTToken } from "../utils/jwt.js";
 
-dotenv.config();
+// dotenv.config();
 
-const JWT_SECRET = process.env.JWT_SECRET;
+// const JWT_SECRET = process.env.JWT_SECRET;
 
 // Utility Function to Generate OTP
 const generateOTP = async () => {
@@ -19,9 +20,41 @@ const generateOTP = async () => {
 };
 
 // Utility Function to Generate JWT Token
-const generateJWTToken = (userId, email) => {
-  return jwt.sign({ userId, email }, JWT_SECRET, { expiresIn: "7d" });
+// const generateJWTToken = (userId, email) => {
+//   return jwt.sign({ userId, email }, JWT_SECRET, { expiresIn: "7d" });
+// };
+
+export const getAuthUser = async (req, res) => {
+  try {
+    const user = await User.findById(req.user.userId).select("-password");
+
+    if (!user) {
+      return res
+        .status(404)
+        .json({ success: false, message: "User not found!" });
+    }
+
+    return res.status(200).json({ success: true, user });
+  } catch (error) {
+    console.error("Get Auth User Error:", error);
+    return res
+      .status(500)
+      .json({ success: false, message: "Internal Server Error!" });
+  }
 };
+
+// export const getAuthUser = async (req, res) => {
+//   try {
+//     const user = await User.findById(req.user.id).select("-password");
+//     if (!user) {
+//       return res.status(404).json({ message: "User not found" });
+//     }
+//     res.json({ user });
+//   } catch (error) {
+//     console.error("Error Finding User!");
+//     res.status(500).json({ success: false, message: "Internal Server Error!" });
+//   }
+// };
 
 export const signup = async (req, res) => {
   try {
@@ -99,6 +132,8 @@ export const login = async (req, res) => {
     //   process.env.JWT_SECRET,
     //   { expiresIn: "7d" }
     // );
+
+    // const token = generateJWTToken(existingUser._id, existingUser.email);
 
     const token = generateJWTToken(existingUser._id, existingUser.email);
 

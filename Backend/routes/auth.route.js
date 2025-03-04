@@ -1,5 +1,6 @@
 import express from "express";
 import {
+  getAuthUser,
   login,
   logout,
   resendVerificationEmail,
@@ -17,9 +18,11 @@ import {
   signupValidation,
   verifyEmailValidation,
 } from "../middlewares/auth.validation.js";
+import { verifyToken } from "../middlewares/auth.middleware.js";
 
 const authRoute = express.Router();
 
+authRoute.get("/me", verifyToken, getAuthUser);
 authRoute.post("/signup", signupValidation, signup);
 authRoute.post("/login", loginValidation, login);
 authRoute.post("/logout", emailValidation, logout);
