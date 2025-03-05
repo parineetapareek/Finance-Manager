@@ -10,7 +10,6 @@ import {
   verifyEmail,
 } from "../controllers/auth.controller.js";
 import {
-  emailValidation,
   loginValidation,
   resendVerificationEmailValidation,
   resetPasswordValidation,
@@ -25,7 +24,7 @@ const authRoute = express.Router();
 authRoute.get("/me", verifyToken, getAuthUser);
 authRoute.post("/signup", signupValidation, signup);
 authRoute.post("/login", loginValidation, login);
-authRoute.post("/logout", emailValidation, logout);
+authRoute.post("/logout", verifyToken, logout);
 authRoute.post("/verifyEmail", verifyEmailValidation, verifyEmail);
 authRoute.post(
   "/resendCode",

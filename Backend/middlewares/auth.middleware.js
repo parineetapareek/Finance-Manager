@@ -26,6 +26,22 @@ export const verifyToken = (req, res, next) => {
     next();
   } catch (error) {
     console.error("JWT Verification Error:", error);
+
+    if (error.name === "TokenExpiredError") {
+      return res
+        .status(403)
+        .json({
+          success: false,
+          message: "Token expired! Please log in again.",
+        });
+    }
+
+    if (error.name === "JsonWebTokenError") {
+      return res
+        .status(403)
+        .json({ success: false, message: "Invalid token!" });
+    }
+
     return res
       .status(500)
       .json({ success: false, message: "Internal server error!" });

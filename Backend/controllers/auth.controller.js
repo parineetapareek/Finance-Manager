@@ -1,16 +1,10 @@
 import bcrypt from "bcryptjs";
-// import jwt from "jsonwebtoken";
-// import dotenv from "dotenv";
 import {
   sendVerificationCode,
   sendWelcomeEmail,
 } from "../middlewares/email.js";
 import User from "../models/user.model.js";
 import { generateJWTToken } from "../utils/jwt.js";
-
-// dotenv.config();
-
-// const JWT_SECRET = process.env.JWT_SECRET;
 
 // Utility Function to Generate OTP
 const generateOTP = async () => {
@@ -19,10 +13,11 @@ const generateOTP = async () => {
   return { otp, hashOTP };
 };
 
-// Utility Function to Generate JWT Token
-// const generateJWTToken = (userId, email) => {
-//   return jwt.sign({ userId, email }, JWT_SECRET, { expiresIn: "7d" });
-// };
+// Utility Function to Handle Errors
+const handleError = (res, error, message = "An error occurred!") => {
+  console.error(message, error);
+  return res.status(500).json({ success: false, message });
+};
 
 export const getAuthUser = async (req, res) => {
   try {
@@ -36,25 +31,9 @@ export const getAuthUser = async (req, res) => {
 
     return res.status(200).json({ success: true, user });
   } catch (error) {
-    console.error("Get Auth User Error:", error);
-    return res
-      .status(500)
-      .json({ success: false, message: "Internal Server Error!" });
+    return handleError(res, error, "Get Auth User Error: ");
   }
 };
-
-// export const getAuthUser = async (req, res) => {
-//   try {
-//     const user = await User.findById(req.user.id).select("-password");
-//     if (!user) {
-//       return res.status(404).json({ message: "User not found" });
-//     }
-//     res.json({ user });
-//   } catch (error) {
-//     console.error("Error Finding User!");
-//     res.status(500).json({ success: false, message: "Internal Server Error!" });
-//   }
-// };
 
 export const signup = async (req, res) => {
   try {
@@ -90,10 +69,7 @@ export const signup = async (req, res) => {
         "User Registered Successfully! Please Check your account to verify email!",
     });
   } catch (error) {
-    console.error("Error Creating User: " + error);
-    return res
-      .status(500)
-      .json({ success: false, message: "An Error Occured!" });
+    return handleError(res, error, "Error Creating User: ");
   }
 };
 
@@ -123,18 +99,6 @@ export const login = async (req, res) => {
         .json({ success: false, message: "Invalid Password!" });
     }
 
-    // JWT Session Management
-    // const token = jwt.sign(
-    //   {
-    //     id: existingUser._id,
-    //     email: existingUser.email,
-    //   },
-    //   process.env.JWT_SECRET,
-    //   { expiresIn: "7d" }
-    // );
-
-    // const token = generateJWTToken(existingUser._id, existingUser.email);
-
     const token = generateJWTToken(existingUser._id, existingUser.email);
 
     res.cookie("token", token, {
@@ -149,10 +113,7 @@ export const login = async (req, res) => {
       message: "Login Successfully!",
     });
   } catch (error) {
-    console.error("Error Creating User: " + error);
-    return res
-      .status(500)
-      .json({ success: false, message: "An Error Occured!" });
+    return handleError(res, error, "Error during Login: ");
   }
 };
 
@@ -162,6 +123,7 @@ export const logout = async (req, res) => {
   if (!email) {
     return res.status(403).json({ success: false, message: "User Not Found!" });
   }
+
   try {
     res.clearCookie("token", {
       httpOnly: true,
@@ -173,10 +135,7 @@ export const logout = async (req, res) => {
       .status(200)
       .json({ success: true, message: "Successfully Logged Out!" });
   } catch (error) {
-    console.error("An Error Occurred while Logging Out: ", error);
-    return res
-      .status(500)
-      .json({ success: false, message: "An Error Occurred!" });
+    return handleError(res, error, "Error during Logout: ");
   }
 };
 
@@ -218,27 +177,11 @@ export const verifyEmail = async (req, res) => {
 
     await sendWelcomeEmail(user.email, user.name);
 
-    // Generate JWT Token after successful verification
-    // const token = jwt.sign(
-    //   { userId: user._id, email: user.email },
-    //   process.env.JWT_SECRET,
-    //   { expiresIn: "7d" }
-    // );
-
-    // res.cookie("token", token, {
-    //   httpOnly: true,
-    //   secure: process.env.NODE_ENV === "production",
-    //   sameSite: "strict",
-    // });
-
     return res
       .status(200)
       .json({ success: true, message: "Account Verified Successfully!" });
   } catch (error) {
-    console.error("Error Verifying Email: ", error);
-    return res
-      .status(500)
-      .json({ success: false, message: "An Error Occurres!" });
+    return handleError(res, error, "Error Verifying Email: ");
   }
 };
 
@@ -273,10 +216,7 @@ export const resendVerificationEmail = async (req, res) => {
         "A new verification email has been sent! Please Check your Inbox!",
     });
   } catch (error) {
-    console.error("Error Resending Verification Email!", error);
-    return res
-      .status(500)
-      .json({ success: false, message: "An Error Occured!" });
+    return handleError(res, error, "Error resending Verification Email: ");
   }
 };
 
@@ -309,10 +249,7 @@ export const sendResetPassCode = async (req, res) => {
         "Reset Password Code Sent Successfully! Please Check your Inbox!",
     });
   } catch (error) {
-    console.error("Error Sending Password Reset Link: ", error);
-    return res
-      .status(500)
-      .json({ success: false, message: "An Error Occured" });
+    return handleError(res, error, "Error sending password reset code: ");
   }
 };
 
@@ -327,7 +264,8 @@ export const resetPassword = async (req, res) => {
       return res
         .status(400)
         .json({ success: false, message: "User Does Not Exists!" });
-    } else if (user.resetCodeExpires < Date.now()) {
+    }
+    if (user.resetCodeExpires < Date.now()) {
       return res.status(403).json({
         success: false,
         message: "OTP Expired, Please Request a New One!",
@@ -358,9 +296,6 @@ export const resetPassword = async (req, res) => {
       .status(200)
       .json({ success: true, message: "Password Changed Successfully!" });
   } catch (error) {
-    console.error("Error Resetting Password!", error);
-    return res
-      .status(500)
-      .json({ success: false, message: "An Error Occurred!" });
+    return handleError(res, error, "Error resetting password:");
   }
 };
