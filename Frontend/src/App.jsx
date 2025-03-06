@@ -8,6 +8,7 @@ import ContactUs from "./pages/ContactUs";
 import VerifyEmail from "./components/VerifyEmail";
 import ForgetPassword from "./components/ForgetPassword";
 import { ToastContainer } from "react-toastify";
+import Dashboard from "./pages/Dashboard";
 
 function App() {
   return (
@@ -20,6 +21,7 @@ function App() {
         <Route path="/contact" element={<ContactUs />} />
         <Route path="/verify" element={<VerifyEmail />} />
         <Route path="/forgetPassword" element={<ForgetPassword />} />
+        <Route path="/dashboard" element={<Dashboard />} />
       </Routes>
       <Footer />
     </>

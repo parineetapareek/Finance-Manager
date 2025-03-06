@@ -22,7 +22,7 @@ function VerifyEmail() {
       const response = await VerifyAccount(email, code);
       setSuccessMessage(response.message);
       setTimeout(() => {
-        navigate("/login");
+        navigate("/");
       }, 2000);
     } catch (error) {
       setError(error.message);
@@ -49,8 +49,8 @@ function VerifyEmail() {
           <button onClick={handleVerify} disabled={loading}>
             {loading ? "Verifying..." : "Verify"}
           </button>
-          {error && <p style={{ color: red }}>{error}</p>}
-          {successMessage && <p style={{ color: green }}>{successMessage}</p>}
+          {error && <p >{error}</p>}
+          {successMessage && <p >{successMessage}</p>}
         </div>
       </div>
     </>

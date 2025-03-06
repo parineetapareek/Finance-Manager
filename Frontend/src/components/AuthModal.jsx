@@ -32,7 +32,7 @@ function AuthModal({ isOpen, onClose }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    setErrors({}); //Clear Previous errors
+    setErrors({}); // Clear previous errors
 
     try {
       const response = isSignup
@@ -50,28 +50,37 @@ function AuthModal({ isOpen, onClose }) {
         onClose();
       }
     } catch (error) {
-      if (error.response && error.response.data.errors) {
-        const newErrors = {};
-        error.response.data.errors.forEach((msg) => {
-          if (msg.toLowerCase().includes("name")) newErrors.name = msg;
-          if (msg.toLowerCase().includes("email")) newErrors.email = msg;
-          if (msg.toLowerCase().includes("password")) newErrors.password = msg;
-        });
-
-        setErrors(newErrors);
-        toast.error("Validation error! Check your inputs!");
+      console.log("Error Object:", error); // Debugging line
+      console.log("Error Response:", error.response); // Debugging line
+    
+      if (error.response) {
+        // Server responded with an error (e.g., 400, 401, 500)
+        const { errors, message } = error.response.data;
+    
+        if (errors && typeof errors === "object") { 
+          // const newErrors = {};
+          // errors.forEach((msg) => {
+          //   if (msg.toLowerCase().includes("name")) newErrors.name = msg;
+          //   if (msg.toLowerCase().includes("email")) newErrors.email = msg;
+          //   if (msg.toLowerCase().includes("password")) newErrors.password = msg;
+          // });
+    
+          // setErrors(newErrors);
+          setErrors(errors);
+          toast.error("Validation error! Check your inputs!");
+        } else if (message) {
+          setErrors({ message });
+          toast.error(message);
+        }
+      } else if (error.request) {
+        // No response received (network error)
+        setErrors({ message: "Network error! Please check your connection." });
+        toast.error("Network error! Please check your connection.");
       } else {
+        // Other errors (e.g., Axios configuration error)
         setErrors({ message: error.message || "Something went wrong" });
         toast.error(error.message || "Something went wrong");
       }
-
-      setFormData({ name: "", email: "", password: "" });
-
-      setTimeout(() => {
-        window.location.reload();
-      }, 3000);
-    } finally {
-      setLoading(false);
     }
   };
 

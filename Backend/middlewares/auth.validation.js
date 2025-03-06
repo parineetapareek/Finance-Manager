@@ -38,10 +38,15 @@ const codeSchema = Joi.string().length(6).required().messages({
 const validateRequest = (schema) => (req, res, next) => {
   const { error } = schema.validate(req.body, { abortEarly: false });
   if (error) {
+    const errors = {};
+    error.details.forEach((err) => {
+      errors[err.context.key] = err.message;
+    });
     return res.status(400).json({
       success: false,
       message: "Validation Error",
-      errors: error.details.map((err) => err.message),
+      // errors: error.details.map((err) => err.message),
+      errors: errors,
     });
   }
   next();
@@ -49,9 +54,9 @@ const validateRequest = (schema) => (req, res, next) => {
 
 export const signupValidation = validateRequest(
   Joi.object({
-    name: Joi.string().trim().min(3).max(50).required().messages({
+    name: Joi.string().trim().min(2).max(50).required().messages({
       "string.empty": "Name is Required!",
-      "string.min": "Name must be atleast 3 characters long!",
+      "string.min": "Name must be atleast 2 characters long!",
       "string.max": "Name cannot exceed 50 characters",
     }),
     email: emailSchema,
