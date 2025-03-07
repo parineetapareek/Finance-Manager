@@ -8,6 +8,7 @@ export const verifyToken = (req, res, next) => {
       ? authHeader.split(" ")[1]
       : null);
 
+      console.log("Token: ",token);
   if (!token) {
     return res
       .status(401)
@@ -22,7 +23,9 @@ export const verifyToken = (req, res, next) => {
         .json({ success: false, message: "Invalid or expired token!" });
     }
 
+    console.log("Decoded Token: ",decoded);
     req.user = decoded;
+    console.log(req.user);
     next();
   } catch (error) {
     console.error("JWT Verification Error:", error);

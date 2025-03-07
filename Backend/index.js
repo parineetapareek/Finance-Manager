@@ -5,6 +5,7 @@ import cookieParser from "cookie-parser";
 import connectDB from "./config/db.js";
 import routes from "./routes/index.js";
 import authRoute from "./routes/auth.route.js";
+import tranRouter from "./routes/transaction.route.js";
 
 dotenv.config();
 
@@ -27,6 +28,7 @@ connectDB();
 // Routes
 app.use("/", routes);
 app.use("/auth", authRoute);
+app.use("/transaction", tranRouter);
 
 // Start Server
 app.listen(port, () => {
