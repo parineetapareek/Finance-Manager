@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { VerifyAccount } from "../services/AuthService";
-import "../styles/verifyEmail.css";
 
 function VerifyEmail() {
   const navigate = useNavigate();
