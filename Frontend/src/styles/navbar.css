@@ -13,3 +13,43 @@
     padding: 5px 15px;
     background-color: white;
 }
+
+/* Make the profile button round */
+.profile-button {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 16px;
+    padding: 0;
+}
+
+/* Ensure the dropdown menu is visible and properly aligned */
+.dropdown-menu {
+    min-width: 150px;
+    border: 1px solid rgba(0, 0, 0, 0.15);
+    border-radius: 15px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.dropdown-item {
+    padding: 8px 16px;
+    cursor: pointer;
+}
+
+.dropdown-item:hover {
+    background-color: #CE93D8;
+    color: white;
+    border: 1px solid #CE93D8;
+    border-radius: 15px;
+    font-size: large;
+}
+
+/* Align the dropdown menu to the right */
+.dropdown-menu-end {
+    right: 0;
+    left: auto;
+}

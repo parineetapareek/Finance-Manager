@@ -1,10 +1,17 @@
-import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import React, { useContext, useEffect, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import AuthModal from "./AuthModal";
 import "../styles/navbar.css";
+import { AppContent } from "../context/AppContext";
 
 function Navbar() {
   const [sticky, setSticky] = useState(false);
+  const [modalOpen, setModalOpen] = useState(false);
+
+  const { isLoggedIn, userData, handleLogout } = useContext(AppContent);
+
+  const navigate = useNavigate();
+
   useEffect(() => {
     const handleScroll = () => {
       if (window.scrollY > 0) {
@@ -19,7 +26,10 @@ function Navbar() {
     };
   }, []);
 
-  const [modalOpen, setModalOpen] = useState(false);
+  const logout = () => {
+    handleLogout();
+    navigate("/");
+  };
 
   return (
     <>
@@ -83,13 +93,46 @@ function Navbar() {
               </ul>
             </div>
           </div>
-          <button
-            onClick={() => setModalOpen(true)}
-            type="button"
-            className="btn btn-outline-dark"
-          >
-            Sign Up
-          </button>
+
+          {isLoggedIn ? (
+            <div className="dropdown">
+              <button
+                className="btn profile-button"
+                type="button"
+                id="profileDropdown"
+                data-bs-toggle="dropdown"
+                aria-expanded="false"
+              >
+                {userData?.name?.charAt(0).toUpperCase() || "P"}{" "}
+                {/* Display user's initial */}
+              </button>
+              <ul className="dropdown-menu dropdown-menu-end" aria-labelledby="profileDropdown">
+                <li>
+                  <Link className="dropdown-item" to="/dashboard">
+                    Dashboard
+                  </Link>
+                </li>
+                <li>
+                  <Link className="dropdown-item" to="/verify">
+                    Verify Account
+                  </Link>
+                </li>
+                <li>
+                  <button className="dropdown-item" onClick={logout}>
+                    Logout
+                  </button>
+                </li>
+              </ul>
+            </div>
+          ) : (
+            <button
+              onClick={() => setModalOpen(true)}
+              type="button"
+              className="btn btn-outline-dark"
+            >
+              Sign Up
+            </button>
+          )}
           <AuthModal isOpen={modalOpen} onClose={() => setModalOpen(false)} />
         </div>
       </nav>

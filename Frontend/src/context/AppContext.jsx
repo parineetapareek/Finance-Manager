@@ -1,20 +1,22 @@
 import { createContext, useEffect, useMemo, useState } from "react";
 import axios from "axios";
+import {
+  getAuthUser,
+  login as authLogin,
+  logout as authLogout,
+} from "../services/AuthService";
 
 export const AppContent = createContext();
 
 export const AppContextProvider = ({ children }) => {
-  const backendUrl = import.meta.env.VITE_BACKEND_URL;
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userData, setUserData] = useState(null);
 
   useEffect(() => {
     const checkAuthStatus = async () => {
       try {
-        const response = await axios.get(`${backendUrl}/auth/me`, {
-          withCredentials: true,
-        });
-        setUserData(response.data.user);
+        const response = await getAuthUser();
+        setUserData(response.user);
         setIsLoggedIn(true);
       } catch (error) {
         setIsLoggedIn(false);
@@ -22,15 +24,23 @@ export const AppContextProvider = ({ children }) => {
       }
     };
     checkAuthStatus();
-  }, [backendUrl]);
+  }, []);
+
+  const login = async (userData) => {
+    try {
+      const response = await authLogin(userData);
+      localStorage.setItem("token", response.token);
+      setUserData(response.user);
+      setIsLoggedIn(true);
+    } catch (error) {
+      throw error;
+    }
+  };
 
   const handleLogout = async () => {
     try {
-      await axios.post(
-        `${backendUrl}/auth/logout`,
-        {},
-        { withCredentials: true }
-      );
+      await authLogout();
+      localStorage.removeItem("token");
       setIsLoggedIn(false);
       setUserData(null);
     } catch (error) {
@@ -40,19 +50,17 @@ export const AppContextProvider = ({ children }) => {
 
   const contextValue = useMemo(
     () => ({
-      backendUrl,
       isLoggedIn,
       setIsLoggedIn,
       userData,
       setUserData,
+      login,
       handleLogout,
     }),
     [isLoggedIn, userData]
   );
 
   return (
-    <AppContent.Provider value={contextValue}>
-      {children}
-    </AppContent.Provider>
+    <AppContent.Provider value={contextValue}>{children}</AppContent.Provider>
   );
 };
