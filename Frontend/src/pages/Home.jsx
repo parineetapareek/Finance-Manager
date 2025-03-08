@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import FeatureCard from "../components/FeatureCard";
 import AuthModal from "../components/AuthModal";
+import "../styles/pages.css";
 
 function Home() {
   const [isModalOpen, setIsModalOpen] = useState(false);

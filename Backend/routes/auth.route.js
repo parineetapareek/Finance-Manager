@@ -3,6 +3,7 @@ import {
   getAuthUser,
   login,
   logout,
+  resendResetPassCode,
   resendVerificationEmail,
   resetPassword,
   sendResetPassCode,
@@ -10,6 +11,7 @@ import {
   verifyEmail,
 } from "../controllers/auth.controller.js";
 import {
+  emailValidation,
   loginValidation,
   resendVerificationEmailValidation,
   resetPasswordValidation,
@@ -37,5 +39,6 @@ authRoute.post(
   sendResetPassCode
 );
 authRoute.post("/resetPass", resetPasswordValidation, resetPassword);
+authRoute.post("/resendResetPassCode", emailValidation, resendResetPassCode);
 
 export default authRoute;

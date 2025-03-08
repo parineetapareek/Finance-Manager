@@ -4,6 +4,7 @@ import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { AppContent } from "../context/AppContext";
 import { login, signup } from "../services/AuthService";
+import "../styles/authmodel.css";
 
 function AuthModal({ isOpen, onClose }) {
   const [isSignup, setIsSignup] = useState(true);
@@ -16,7 +17,6 @@ function AuthModal({ isOpen, onClose }) {
   const [loading, setLoading] = useState(false);
 
   const navigate = useNavigate();
-
   const { setIsLoggedIn, setUserData } = useContext(AppContent);
 
   const toggleForm = () => {
@@ -27,12 +27,26 @@ function AuthModal({ isOpen, onClose }) {
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
+    setErrors({ ...errors, [e.target.name]: "" });
+  };
+
+  const validateFields = () => {
+    let newErrors = {};
+    if (isSignup && !formData.name.trim()) newErrors.name = "Name is required!";
+    if (!formData.email.trim()) newErrors.email = "Email is required!";
+    if (!formData.password.trim())
+      newErrors.password = "Password cannot be empty!";
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (loading) return;
+    if (!validateFields()) return;
+
     setLoading(true);
-    setErrors({}); // Clear previous errors
+    setErrors({});
 
     try {
       const response = isSignup
@@ -50,39 +64,20 @@ function AuthModal({ isOpen, onClose }) {
         onClose();
       }
     } catch (error) {
-      console.log("Error Object:", error); // Debugging line
-      console.log("Error Response:", error.response); // Debugging line
-    
-      if (error.response) {
-        // Server responded with an error (e.g., 400, 401, 500)
-        const { errors, message } = error.response.data;
-    
-        if (errors && typeof errors === "object") { 
-          // const newErrors = {};
-          // errors.forEach((msg) => {
-          //   if (msg.toLowerCase().includes("name")) newErrors.name = msg;
-          //   if (msg.toLowerCase().includes("email")) newErrors.email = msg;
-          //   if (msg.toLowerCase().includes("password")) newErrors.password = msg;
-          // });
-    
-          // setErrors(newErrors);
-          setErrors(errors);
-          toast.error("Validation error! Check your inputs!");
-        } else if (message) {
-          setErrors({ message });
-          toast.error(message);
-        }
-      } else if (error.request) {
-        // No response received (network error)
-        setErrors({ message: "Network error! Please check your connection." });
-        toast.error("Network error! Please check your connection.");
-      } else {
-        // Other errors (e.g., Axios configuration error)
-        setErrors({ message: error.message || "Something went wrong" });
-        toast.error(error.message || "Something went wrong");
-      }
+      console.error("Auth Error:", error);
+      const formattedErrors = error.errors?.reduce((acc, curr) => {
+        acc[curr.field] = curr.message;
+        return acc;
+      }, {});
+
+      setErrors(formattedErrors || {});
+      toast.error(error.message || "An error occurred. Please try again.");
+    } finally {
+      setLoading(false);
     }
   };
+
+  if (!isOpen) return null;
 
   return (
     isOpen && (
@@ -95,15 +90,17 @@ function AuthModal({ isOpen, onClose }) {
 
           <form onSubmit={handleSubmit} className="auth-form">
             {isSignup && (
-              <input
-                type="text"
-                name="name"
-                placeholder="Full Name"
-                value={formData.name}
-                onChange={handleChange}
-              />
+              <>
+                <input
+                  type="text"
+                  name="name"
+                  placeholder="Full Name"
+                  value={formData.name}
+                  onChange={handleChange}
+                />
+                {errors.name && <span className="error">{errors.name}</span>}
+              </>
             )}
-            {errors.name && <span className="error">{errors.name}</span>}
 
             <input
               type="email"
@@ -126,8 +123,16 @@ function AuthModal({ isOpen, onClose }) {
             )}
 
             {!isSignup && (
-              <p className="fpass" onClick={() => navigate("/forgetPassword")}>
-                <span>Forgot Password?</span>
+              <p className="fpass">
+                <span
+                  onClick={(e) => {
+                    e.preventDefault();
+                    onClose && onClose();
+                    navigate("/forgetPassword");
+                  }}
+                >
+                  Forgot Password?
+                </span>
               </p>
             )}
 
@@ -135,7 +140,7 @@ function AuthModal({ isOpen, onClose }) {
               {loading ? "Processing..." : isSignup ? "Sign Up" : "Login"}
             </button>
 
-            {errors.message && <span className="error">{errors.message}</span>}
+            {errors.general && <span className="error">{errors.general}</span>}
           </form>
 
           <p className="toggle-text">

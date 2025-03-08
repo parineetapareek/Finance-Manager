@@ -1,0 +1,99 @@
+.verifyContainer , .resetPassContainer {
+    display: flex;
+    flex-direction: column;
+    height: 81vh;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+}
+
+.verifyContainer h1, .resetPassContainer h1 {
+    color: #9C27B0;
+}
+
+.mainVerify, .mainReset{
+    max-width: 450px;
+    height: auto;
+    border: 1px solid black;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 25px;
+    background: white;
+}
+
+.mainVerify p, .mainReset p {
+    font-size: 0.95rem;
+    color: #333;
+    margin-bottom: 15px;
+}
+
+.mainVerify input, .mainReset input {
+    width: 85%;
+    padding: 10px;
+    font-size: 1rem;
+    border: none;
+    border-bottom: 2px solid #9C27B0;
+    border-radius: 5px;
+    outline: none;
+    background: transparent;
+    margin-bottom: 10px;
+    transition: border-color 0.3s;
+}
+
+.mainVerify input:focus, .mainReset input:focus {
+    border-color: #ffb300;
+}
+
+.mainVerify button, .mainReset button {
+    width: 90%;
+    padding: 12px;
+    font-size: 1rem;
+    font-weight: bold;
+    background-color: #9c27b0;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: 0.3s ease-in-out;
+}
+
+.mainVerify button:hover, .mainReset button:hover {
+    background-color: #7b1fa2;
+}
+
+.error {
+    color: red;
+    font-size: 0.85rem;
+    margin-top: 10px;
+}
+
+.success {
+    color: green;
+    font-size: 0.85rem;
+    margin-top: 10px;
+}
+
+.resend-text {
+    font-size: 0.9rem;
+    margin-top: 15px;
+}
+
+.resend-text span {
+    color: #9C27B0;
+    font-weight: bold;
+    cursor: pointer;
+    text-decoration: underline;
+}
+
+.resend-text span:hover {
+    color: #7B1FA2;
+}
+
+.resend-text .disabled {
+    color: gray;
+    cursor: not-allowed;
+}

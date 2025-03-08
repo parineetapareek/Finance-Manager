@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import AuthModal from "../components/AuthModal";
+import "../styles/pages.css";
 
 function About() {
   const navigate = useNavigate();

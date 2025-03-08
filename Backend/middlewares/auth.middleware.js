@@ -8,7 +8,7 @@ export const verifyToken = (req, res, next) => {
       ? authHeader.split(" ")[1]
       : null);
 
-      console.log("Token: ",token);
+  console.log("Token: ", token);
   if (!token) {
     return res
       .status(401)
@@ -23,7 +23,7 @@ export const verifyToken = (req, res, next) => {
         .json({ success: false, message: "Invalid or expired token!" });
     }
 
-    console.log("Decoded Token: ",decoded);
+    console.log("Decoded Token: ", decoded);
     req.user = decoded;
     console.log(req.user);
     next();
@@ -31,12 +31,10 @@ export const verifyToken = (req, res, next) => {
     console.error("JWT Verification Error:", error);
 
     if (error.name === "TokenExpiredError") {
-      return res
-        .status(403)
-        .json({
-          success: false,
-          message: "Token expired! Please log in again.",
-        });
+      return res.status(403).json({
+        success: false,
+        message: "Token expired! Please log in again.",
+      });
     }
 
     if (error.name === "JsonWebTokenError") {

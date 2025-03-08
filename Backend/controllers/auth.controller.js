@@ -1,5 +1,7 @@
 import bcrypt from "bcryptjs";
 import {
+  sendForgetPassCode,
+  sendPassChangeConfirmEmail,
   sendVerificationCode,
   sendWelcomeEmail,
 } from "../middlewares/email.js";
@@ -29,7 +31,9 @@ export const getAuthUser = async (req, res) => {
         .json({ success: false, message: "User not found!" });
     }
 
-    return res.status(200).json({ success: true, user });
+    return res
+      .status(200)
+      .json({ success: true, message: "User Found Successfuly: ", user });
   } catch (error) {
     return handleError(res, error, "Get Auth User Error: ");
   }
@@ -119,12 +123,6 @@ export const login = async (req, res) => {
 };
 
 export const logout = async (req, res) => {
-  const { email } = req.body;
-
-  if (!email) {
-    return res.status(403).json({ success: false, message: "User Not Found!" });
-  }
-
   try {
     res.clearCookie("token", {
       httpOnly: true,
@@ -148,7 +146,7 @@ export const verifyEmail = async (req, res) => {
     console.log(user);
 
     if (!user) {
-      return res.status(403).json({
+      return res.status(404).json({
         success: false,
         message: "User not Found!",
       });
@@ -238,7 +236,7 @@ export const sendResetPassCode = async (req, res) => {
 
     const { otp, hashOTP } = await generateOTP();
 
-    sendVerificationCode(email, otp);
+    await sendForgetPassCode(email, otp);
 
     user.resetCode = hashOTP;
     user.resetCodeExpires = Date.now() + 10 * 60 * 1000; //10 min
@@ -266,6 +264,7 @@ export const resetPassword = async (req, res) => {
         .status(400)
         .json({ success: false, message: "User Does Not Exists!" });
     }
+
     if (user.resetCodeExpires < Date.now()) {
       return res.status(403).json({
         success: false,
@@ -275,14 +274,14 @@ export const resetPassword = async (req, res) => {
 
     const isMatch = await bcrypt.compare(code, user.resetCode);
     if (!isMatch) {
-      return res.status(403).json({ success: false, message: "Invalid OTP!" });
+      return res.status(401).json({ success: false, message: "Invalid OTP!" });
     }
 
     const hashNewPass = await bcrypt.hash(newPass, 10);
 
     const isDiff = await bcrypt.compare(newPass, user.password);
     if (isDiff) {
-      return res.status(403).json({
+      return res.status(400).json({
         success: false,
         message: "Old Password and New Password cant be same!",
       });
@@ -293,10 +292,47 @@ export const resetPassword = async (req, res) => {
     user.resetCodeExpires = undefined;
     await user.save();
 
+    await sendPassChangeConfirmEmail(user.email, user.name);
+
     return res
       .status(200)
       .json({ success: true, message: "Password Changed Successfully!" });
   } catch (error) {
     return handleError(res, error, "Error resetting password:");
+  }
+};
+
+export const resendResetPassCode = async (req, res) => {
+  try {
+    const { email } = req.body;
+
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res
+        .status(404)
+        .json({ success: false, message: "User Not Found!" });
+    }
+
+    if (!user.isVerified) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Email Not Verified!" });
+    }
+
+    const { otp, hashOTP } = await generateOTP();
+
+    user.resetCode = hashOTP;
+    user.resetCodeExpires = Date.now() + 10 * 60 * 1000;
+    await user.save();
+
+    await sendForgetPassCode(email, otp);
+
+    return res.status(200).json({
+      success: true,
+      message:
+        "A new Password Reset Code has been sent! Please Check your Inbox!",
+    });
+  } catch (error) {
+    return handleError(res, error, "Error resending Password Reset Code: ");
   }
 };

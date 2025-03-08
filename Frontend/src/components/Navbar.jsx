@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import AuthModal from "./AuthModal";
+import "../styles/navbar.css";
 
 function Navbar() {
   const [sticky, setSticky] = useState(false);
