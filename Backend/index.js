@@ -6,6 +6,7 @@ import connectDB from "./config/db.js";
 import routes from "./routes/index.js";
 import authRoute from "./routes/auth.route.js";
 import tranRouter from "./routes/transaction.route.js";
+import accountRouter from "./routes/account.route.js";
 
 dotenv.config();
 
@@ -29,6 +30,7 @@ connectDB();
 app.use("/", routes);
 app.use("/auth", authRoute);
 app.use("/transaction", tranRouter);
+app.use("/account", accountRouter);
 
 // Start Server
 app.listen(port, () => {

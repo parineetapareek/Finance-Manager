@@ -7,9 +7,14 @@ const transactionSchema = new mongoose.Schema(
       ref: "User",
       required: true,
     },
+    accountId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Account",
+      required: true,
+    },
     tranType: {
       type: String,
-      enum: ["Income", "Expense", "Bank Balance"],
+      enum: ["Income", "Expense"],
       required: true,
     },
     category: {
@@ -19,6 +24,7 @@ const transactionSchema = new mongoose.Schema(
     amount: {
       type: Number,
       required: true,
+      min: 0,
     },
     date: {
       type: Date,
@@ -27,6 +33,13 @@ const transactionSchema = new mongoose.Schema(
     },
     description: {
       type: String,
+      default: "",
+    },
+    source: {
+      type: String,
+    },
+    balanceAfterTransaction: {
+      type: Number,
     },
   },
   { timestamps: true }
