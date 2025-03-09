@@ -4,6 +4,7 @@ import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import {
   addTransaction,
+  deleteMultipleTransactions,
   deleteTransaction,
   getTransactions,
   updateTransaction,
@@ -27,6 +28,7 @@ function Transactions() {
   const [userId, setUserId] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [selectedTransactions, setSelectedTransactions] = useState([]);
 
   useEffect(() => {
     const fetchUserIdAndAccounts = async () => {
@@ -61,7 +63,7 @@ function Transactions() {
       setTransactions(data.transactions);
     } catch (error) {
       console.error("Error fetching transactions:", error.message);
-      setError("Failed to fetch transactions. Please try again.");
+      setError(error.message);
     } finally {
       setLoading(false);
     }
@@ -158,6 +160,48 @@ function Transactions() {
     }
   };
 
+  // Handle selecting/deselecting a transaction
+  const handleSelectTransaction = (id) => {
+    if (selectedTransactions.includes(id)) {
+      setSelectedTransactions(
+        selectedTransactions.filter((txnId) => txnId !== id)
+      );
+    } else {
+      setSelectedTransactions([...selectedTransactions, id]);
+    }
+  };
+
+  // Handle selecting/deselecting all transactions
+  const handleSelectAllTransactions = () => {
+    if (selectedTransactions.length === transactions.length) {
+      setSelectedTransactions([]);
+    } else {
+      setSelectedTransactions(transactions.map((txn) => txn._id));
+    }
+  };
+
+  // Handle deleting multiple transactions
+  const handleDeleteMultipleTransactions = async () => {
+    if (selectedTransactions.length === 0) {
+      toast.warning("No transactions selected!");
+      return;
+    }
+
+    setLoading(true);
+    try {
+      await deleteMultipleTransactions(selectedTransactions);
+      toast.success("Selected transactions deleted successfully!");
+      setSelectedTransactions([]);
+      fetchTransactions();
+    } catch (error) {
+      console.error("Error deleting multiple transactions:", error.message);
+      setError("Failed to delete selected transactions. Please try again.");
+      toast.error(error.message || "Error deleting selected transactions!");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <>
       <div className="transacMain">
@@ -166,13 +210,33 @@ function Transactions() {
           <div className="tranInfo">
             <h2>Transactions</h2>
 
-            {/* {error && <p className="error">{error}</p>} */}
+            {error && <p className="error">{error}</p>}
             {loading && <p>Loading...</p>}
+
+            {/* Delete Selected Button */}
+            {selectedTransactions.length > 0 && (
+              <button
+                className="deleteSelectedBtn"
+                onClick={handleDeleteMultipleTransactions}
+                disabled={loading}
+              >
+                Delete Selected
+              </button>
+            )}
 
             {/* Transaction Table */}
             <table>
               <thead>
                 <tr>
+                  <th>
+                    <input
+                      type="checkbox"
+                      checked={
+                        selectedTransactions.length === transactions.length
+                      }
+                      onChange={handleSelectAllTransactions}
+                    />
+                  </th>
                   <th>Category</th>
                   <th>Amount</th>
                   <th>Type</th>
@@ -184,6 +248,13 @@ function Transactions() {
                 {transactions.length > 0 ? (
                   transactions.map((txn) => (
                     <tr key={txn._id}>
+                      <td>
+                        <input
+                          type="checkbox"
+                          checked={selectedTransactions.includes(txn._id)}
+                          onChange={() => handleSelectTransaction(txn._id)}
+                        />
+                      </td>
                       <td>{txn.category}</td>
                       <td>₹{txn.amount}</td>
                       <td>{txn.tranType}</td>
@@ -206,7 +277,7 @@ function Transactions() {
                   ))
                 ) : (
                   <tr>
-                    <td colSpan="5">No transactions found.</td>
+                    <td colSpan="6">No transactions found.</td>
                   </tr>
                 )}
               </tbody>
@@ -238,7 +309,7 @@ function Transactions() {
                   setNewTransaction({
                     ...newTransaction,
                     amount: Number(e.target.value),
-                    value: 0
+                    value: 0,
                   })
                 }
                 required
