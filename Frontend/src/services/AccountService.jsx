@@ -50,3 +50,13 @@ export const deleteAccount = async (accId) => {
     throw handleError(error, "Failed to delete account!");
   }
 };
+
+export const getTotalBankBalance = async(userId) =>{
+  try {
+    const response = await axios.get(`${apiURL}/totalBal/${userId}`);
+    console.log(response.data);
+    return response.data;
+  } catch (error) {
+    throw handleError(error, "Failed to fetch total Bank Balance!");
+  }
+}

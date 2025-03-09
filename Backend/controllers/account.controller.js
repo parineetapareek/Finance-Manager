@@ -175,3 +175,36 @@ export const deleteAccount = async (req, res) => {
     });
   }
 };
+
+// Get Total Balance
+export const getTotalBankBalance = async (req, res) => {
+  try {
+    const { userId } = req.params;
+    console.log(req.params);
+    console.log(userId);
+
+    const account = await Account.find({ userId });
+    if (!account || account.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "No Accounts not found!",
+        totalBalance: 0,
+      });
+    }
+
+    const totalBalance = account.reduce((sum, acc) => sum + acc.bankBalance, 0);
+
+    return res.status(200).json({
+      success: true,
+      message: "Total bank balance retrieved successfully",
+      totalBalance,
+    });
+  } catch (error) {
+    console.error("An Error Occurred: ", error);
+    return res.status(500).json({
+      success: false,
+      message: "Error Fetching Total Bank Balance",
+      error,
+    });
+  }
+};

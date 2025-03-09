@@ -5,6 +5,7 @@ import {
   createAccount,
   deleteAccount,
   getAccountsByUser,
+  getTotalBankBalance,
   updateAccountBalance,
 } from "../services/AccountService";
 import "../styles/account.css";
@@ -21,6 +22,7 @@ function Account() {
   const [userId, setUserId] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [totalBalance, setTotalBalance] = useState(0);
 
   useEffect(() => {
     const fetchUserId = async () => {
@@ -49,6 +51,10 @@ function Account() {
       console.log("fetch accounts: ", data);
       console.log("data.accounts: ", data.account);
       setAccounts(data.account);
+
+      const balance = await getTotalBankBalance(userId);
+      console.log("Balance: ", balance);
+      setTotalBalance(balance.totalBalance);
     } catch (error) {
       console.error("Error fetching accounts:", error.message);
       setError("Failed to fetch accounts. Please try again.");
@@ -210,6 +216,9 @@ function Account() {
               )}
             </tbody>
           </table>
+          <div className="total-balance">
+            <h4>Total Bank Balance: ₹{totalBalance.toLocaleString()}</h4>
+          </div>
         </div>
 
         <div className="createAcc">

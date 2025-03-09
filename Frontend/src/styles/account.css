@@ -141,6 +141,13 @@ select:focus {
     text-align: left;
 }
 
+.total-balance {
+    display: inline-block;
+    font-weight: bold;
+    margin-top: 10px;
+    white-space: nowrap;
+}
+
 /* Responsive */
 @media (max-width: 768px) {
     .accContent {
