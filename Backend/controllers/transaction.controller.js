@@ -49,14 +49,6 @@ export const addTransaction = async (req, res) => {
         .json({ success: false, message: "Date cannot be in the future!" });
     }
 
-    // Validate source for income transactions
-    if (tranType === "Income" && !source) {
-      return res.status(400).json({
-        success: false,
-        message: "Source is required for income transactions!",
-      });
-    }
-
     const account = await Account.findById(accountId);
     console.log("Account: ", account);
     if (!account || account.userId.toString() !== req.user.userId) {
@@ -231,46 +223,63 @@ export const updateTransaction = async (req, res) => {
       }
     }
 
-    const account = await Account.findById(transaction.accountId);
-    if (!account) {
+    // Get the old account
+    const oldAccount = await Account.findById(transaction.accountId);
+    if (!oldAccount) {
       return res
         .status(404)
         .json({ success: false, message: "Associated account not found!" });
     }
 
-    // Revert the old transaction's impact on the balance
+    // Revert old transaction impact
     if (transaction.tranType === "Income") {
-      account.bankBalance -= transaction.amount;
-    } else if (transaction.tranType === "Expense") {
-      account.bankBalance += transaction.amount;
+      oldAccount.bankBalance -= transaction.amount;
+    } else {
+      oldAccount.bankBalance += transaction.amount;
     }
 
-    // Apply the new transaction's impact on the balance
-    if (tranType === "Income") {
-      account.bankBalance += amount || transaction.amount;
-    } else if (tranType === "Expense") {
-      if (account.bankBalance < (amount || transaction.amount)) {
+    // Determine if the account has changed
+    let newAccount = oldAccount;
+    if (accountId && accountId !== transaction.accountId.toString()) {
+      newAccount = await Account.findById(accountId);
+      if (!newAccount) {
+        return res
+          .status(404)
+          .json({ success: false, message: "New account not found!" });
+      }
+    }
+
+    // Determine new amount and transaction type
+    const newAmount = amount !== undefined ? amount : transaction.amount;
+    const newTranType = tranType || transaction.tranType;
+
+    // Apply new transaction impact
+    if (newTranType === "Income") {
+      newAccount.bankBalance += newAmount;
+    } else {
+      if (newAccount.bankBalance < newAmount) {
         return res
           .status(400)
           .json({ success: false, message: "Insufficient balance!" });
       }
-      account.bankBalance -= amount || transaction.amount;
+      newAccount.bankBalance -= newAmount;
     }
 
-    // Update the transaction
-    Object.assign(transaction, {
-      tranType: tranType || transaction.tranType,
-      category: category || transaction.category,
-      amount: amount || transaction.amount,
-      date: parsedDate || transaction.date,
-      description: description || transaction.description,
-      accountId: accountId || transaction.accountId,
-      source: tranType === "Income" ? source : undefined,
-      balanceAfterTransaction: account.bankBalance,
-    });
+    // Update transaction details
+    transaction.tranType = newTranType;
+    transaction.category = category || transaction.category;
+    transaction.amount = newAmount;
+    transaction.date = parsedDate || transaction.date;
+    transaction.description = description || transaction.description;
+    transaction.accountId = accountId || transaction.accountId;
+    transaction.source = newTranType === "Income" ? source : transaction.source;
+    transaction.balanceAfterTransaction = newAccount.bankBalance;
 
     await transaction.save();
-    await account.save();
+    await oldAccount.save(); // Save old account changes
+    if (newAccount._id.toString() !== oldAccount._id.toString()) {
+      await newAccount.save(); // Save new account changes only if changed
+    }
 
     return res.status(200).json({
       success: true,

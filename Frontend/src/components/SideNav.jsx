@@ -21,7 +21,7 @@ function SideNav() {
           </li>
           <li>
             <img src="transaction.svg" />
-            <Link to="/spending">Spendings</Link>
+            <Link to="/transaction">Transactions</Link>
           </li>
           <li>
             <img src="moneybag.svg" />

@@ -13,8 +13,8 @@ import Budget from "./pages/Budget";
 import Debt from "./pages/Debt";
 import Investment from "./pages/Investment";
 import Savings from "./pages/Savings";
-import Spending from "./pages/Spending";
 import Account from "./pages/Account";
+import Transactions from "./pages/Transactions";
 
 function App() {
   return (
@@ -33,7 +33,7 @@ function App() {
         <Route path="/account" element={<Account />} />
         <Route path="/investment" element={<Investment />} />
         <Route path="/savings" element={<Savings />} />
-        <Route path="/spending" element={<Spending />} />
+        <Route path="/transaction" element={<Transactions />} />
       </Routes>
       <Footer />
     </>

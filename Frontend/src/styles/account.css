@@ -1,11 +1,13 @@
-.accMain {
+.accMain,
+.transacMain {
     display: flex;
     min-height: 100vh;
     gap: 20px;
     padding: 20px;
 }
 
-.accContent {
+.accContent,
+.transacContent {
     display: flex;
     flex: 3;
     gap: 20px;
@@ -13,7 +15,8 @@
     align-items: flex-start;
 }
 
-.createAcc {
+.createAcc,
+.addTransaction {
     background: white;
     padding: 30px;
     border-radius: 25px;
@@ -23,7 +26,8 @@
     box-shadow: 0px 6px 15px rgba(0, 0, 0, 0.1);
 }
 
-.accInfo {
+.accInfo,
+.tranInfo {
     flex: 2;
     background: white;
     padding: 20px;
@@ -117,7 +121,8 @@ select:focus {
     border-bottom: 2px solid #FFB300;
 }
 
-.createAcc button {
+.createAcc button,
+.addTransaction button {
     padding: 12px;
     font-size: medium;
     font-weight: 700;
@@ -129,12 +134,14 @@ select:focus {
     transition: 0.3s;
 }
 
-.createAcc button:hover {
+.createAcc button:hover,
+.addTransaction button:hover {
     background-color: #7B1FA2;
 }
 
 /* Error Messages */
-.createAcc .error {
+.createAcc .error,
+.addTransaction .error {
     color: red;
     font-size: 0.8rem;
     margin-top: -10px;
@@ -150,13 +157,17 @@ select:focus {
 
 /* Responsive */
 @media (max-width: 768px) {
-    .accContent {
+
+    .accContent,
+    .transacContent {
         flex-direction: column;
         align-items: center;
     }
 
     .accInfo,
-    .createAcc {
+    .createAcc,
+    .tranInfo,
+    .addTransaction {
         width: 100%;
     }
 }
