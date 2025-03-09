@@ -7,6 +7,17 @@ const budgetSchema = new mongoose.Schema(
       ref: "User",
       required: true,
     },
+    accountId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Account",
+      required: true,
+    },
+    transactions: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Transaction",
+      },
+    ],
     planType: {
       type: String,
       enum: ["50/30/20", "60/30/20", "40/30/20/10", "Custom"],
@@ -20,8 +31,6 @@ const budgetSchema = new mongoose.Schema(
     startDate: { type: Date, required: true },
     endDate: { type: Date, required: true },
 
-    bankBalanceSnapshot: { type: Number, required: true },
-
     allocations: {
       needs: { type: Number, required: true },
       wants: { type: Number, required: true },
@@ -33,13 +42,6 @@ const budgetSchema = new mongoose.Schema(
       type: Map,
       of: Number,
     },
-
-    transactions: [
-      {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Transaction",
-      },
-    ],
 
     remainingBudget: {
       type: Number,

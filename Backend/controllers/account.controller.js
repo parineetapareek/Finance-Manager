@@ -3,20 +3,29 @@ import Account from "../models/account.model.js";
 // Create a new account
 export const createAccount = async (req, res) => {
   try {
-    const { userId } = req.body;
+    const { userId, bankName, accountType, bankBalance } = req.body;
     console.log(req.body);
 
-    // Check if the user already has an account
-    const existingAccount = await Account.findOne({ userId });
-    if (existingAccount) {
+    if (!userId || !bankName || !accountType) {
       return res.status(400).json({
         success: false,
-        message: "Account already exists for this user!",
+        message: "User ID, bank name, and account type are required!",
       });
     }
 
-    // Create a new account
-    const newAccount = new Account({ userId });
+    if (bankBalance < 0) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Bank balance cannot be negative!" });
+    }
+
+    const newAccount = new Account({
+      userId,
+      bankName,
+      accountType,
+      bankBalance: bankBalance || 0,
+    });
+
     const savedAccount = await newAccount.save();
 
     return res.status(201).json({
@@ -41,7 +50,7 @@ export const getAccountByUserId = async (req, res) => {
     console.log(req.params);
     console.log(userId);
 
-    const account = await Account.findOne({ userId });
+    const account = await Account.find({ userId });
     if (!account) {
       return res.status(404).json({
         success: false,
@@ -66,20 +75,23 @@ export const getAccountByUserId = async (req, res) => {
 
 // Update account balance
 export const updateAccountBalance = async (req, res) => {
+  console.log(req.body);
+  console.log(req.params);
+
   try {
-    const { userId } = req.params;
+    const { accId } = req.params;
     const { amount, operation } = req.body; // operation: "add" or "subtract"
 
-    console.log("userId: ",userId);
-    console.log("req.params: ",req.params);
-    console.log("amount: ",amount);
-    console.log("operation: ",operation);
+    console.log("accId: ", accId);
+    console.log("req.params: ", req.params);
+    console.log("amount: ", amount);
+    console.log("operation: ", operation);
 
     // Validate input
-    if (!userId || !amount || !operation) {
+    if (!accId || !amount || !operation) {
       return res.status(400).json({
         success: false,
-        message: "User ID, amount, and operation are required!",
+        message: "Account ID, amount, and operation are required!",
       });
     }
 
@@ -98,7 +110,7 @@ export const updateAccountBalance = async (req, res) => {
     }
 
     // Find the account
-    const account = await Account.findOne({ userId });
+    const account = await Account.findById(accId);
     if (!account) {
       return res.status(404).json({
         success: false,
@@ -136,12 +148,13 @@ export const updateAccountBalance = async (req, res) => {
   }
 };
 
-// Delete account by user ID
+// Delete account by account ID
 export const deleteAccount = async (req, res) => {
   try {
-    const { userId } = req.params;
+    const { accId } = req.params;
+    console.log("accId: ", accId);
 
-    const account = await Account.findOneAndDelete({ userId });
+    const account = await Account.findByIdAndDelete(accId);
     if (!account) {
       return res.status(404).json({
         success: false,

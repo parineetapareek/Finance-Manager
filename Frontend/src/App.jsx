@@ -11,10 +11,10 @@ import { ToastContainer } from "react-toastify";
 import Dashboard from "./pages/Dashboard";
 import Budget from "./pages/Budget";
 import Debt from "./pages/Debt";
-import Income from "./pages/Income";
 import Investment from "./pages/Investment";
 import Savings from "./pages/Savings";
 import Spending from "./pages/Spending";
+import Account from "./pages/Account";
 
 function App() {
   return (
@@ -30,7 +30,7 @@ function App() {
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/budget" element={<Budget />} />
         <Route path="/debt" element={<Debt />} />
-        <Route path="/income" element={<Income />} />
+        <Route path="/account" element={<Account />} />
         <Route path="/investment" element={<Investment />} />
         <Route path="/savings" element={<Savings />} />
         <Route path="/spending" element={<Spending />} />

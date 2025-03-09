@@ -1,0 +1,155 @@
+.accMain {
+    display: flex;
+    min-height: 100vh;
+    gap: 20px;
+    padding: 20px;
+}
+
+.accContent {
+    display: flex;
+    flex: 3;
+    gap: 20px;
+    justify-content: center;
+    align-items: flex-start;
+}
+
+.createAcc {
+    background: white;
+    padding: 30px;
+    border-radius: 25px;
+    width: 350px;
+    text-align: center;
+    position: relative;
+    box-shadow: 0px 6px 15px rgba(0, 0, 0, 0.1);
+}
+
+.accInfo {
+    flex: 2;
+    background: white;
+    padding: 20px;
+    border-radius: 25px;
+    box-shadow: 0px 6px 15px rgba(0, 0, 0, 0.1);
+    min-width: 300px;
+    max-width: 800px;
+}
+
+h2 {
+    text-align: center;
+    font-size: 1.8rem;
+    font-weight: bold;
+    margin-bottom: 20px;
+}
+
+.error {
+    color: #dc3545;
+    text-align: center;
+    font-size: 1rem;
+    margin-bottom: 15px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+}
+
+th,
+td {
+    border: 1px solid #ddd;
+    padding: 10px;
+    text-align: center;
+}
+
+th {
+    background-color: #AB47BC;
+    color: white;
+}
+
+td {
+    background: #f3e5f5;
+}
+
+button {
+    background-color: #AB47BC;
+    color: white;
+    border: none;
+    cursor: pointer;
+    transition: 0.3s ease-in-out;
+    margin-top: 5px;
+    padding: 5px;
+    border-radius: 7px;
+}
+
+button:hover {
+    background-color: #9C27B0;
+    transform: scale(1.05);
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    max-width: 500px;
+    margin: auto;
+}
+
+label {
+    text-align: left;
+    font-weight: bold;
+    color: #212529;
+}
+
+input,
+select {
+    width: 100%;
+    padding: 8px 0;
+    font-size: 1rem;
+    border: none;
+    border-bottom: 2px solid #9C27B0;
+    border-radius: 5px;
+    outline: none;
+    background: transparent;
+    transition: border-color 0.3s;
+}
+
+input:focus,
+select:focus {
+    border-bottom: 2px solid #FFB300;
+}
+
+.createAcc button {
+    padding: 12px;
+    font-size: medium;
+    font-weight: 700;
+    background-color: #9C27B0;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.createAcc button:hover {
+    background-color: #7B1FA2;
+}
+
+/* Error Messages */
+.createAcc .error {
+    color: red;
+    font-size: 0.8rem;
+    margin-top: -10px;
+    text-align: left;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .accContent {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .accInfo,
+    .createAcc {
+        width: 100%;
+    }
+}

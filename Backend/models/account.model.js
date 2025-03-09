@@ -6,7 +6,15 @@ const accountSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
       required: true,
-      unique: true,
+    },
+    bankName: {
+      type: String,
+      required: true,
+    },
+    accountType: {
+      type: String,
+      enum: ["Savings", "Credit Card", "Wallet", "Other"],
+      required: true,
     },
     bankBalance: {
       type: Number,

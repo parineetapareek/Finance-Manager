@@ -10,7 +10,7 @@ const accountRouter = express.Router();
 
 accountRouter.post("/create", createAccount);
 accountRouter.get("/:userId", getAccountByUserId);
-accountRouter.patch("/update/:userId", updateAccountBalance);
-accountRouter.delete("/del/:userId", deleteAccount);
+accountRouter.put("/update/:accId", updateAccountBalance);
+accountRouter.delete("/del/:accId", deleteAccount);
 
 export default accountRouter;

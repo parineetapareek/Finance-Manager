@@ -11,9 +11,13 @@ function SideNav() {
             <img src="dash.svg" />
             <Link to="/dashboard">Dashboard</Link>
           </li>
+          {/* <li>
+            <img src="account.svg" />
+            <Link to="/account">Accounts</Link>
+          </li> */}
           <li>
             <img src="wallet.svg" />
-            <Link to="/income">Income</Link>
+            <Link to="/account">Accounts</Link>
           </li>
           <li>
             <img src="transaction.svg" />
