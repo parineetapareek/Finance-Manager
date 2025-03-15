@@ -260,14 +260,8 @@ function Transactions() {
                       <td>{txn.tranType}</td>
                       <td>{new Date(txn.date).toLocaleDateString()}</td>
                       <td>
+                        <button onClick={() => handleEdit(txn)}>Edit</button>
                         <button
-                          className="editBtn"
-                          onClick={() => handleEdit(txn)}
-                        >
-                          Edit
-                        </button>
-                        <button
-                          className="deleteBtn"
                           onClick={() => handleDeleteTransaction(txn._id)}
                         >
                           Delete

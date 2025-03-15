@@ -15,10 +15,12 @@ const handleError = (error, defaultMessage) => {
 export const getTransactions = async () => {
   console.log("in get transaction");
   try {
+    console.log("In try of get transactions");
     const response = await axios.get(
       `${apiURL}/getTransactions`,
       { withCredentials: true } 
     );
+    console.log("Response.data: ",response.data);
     return response.data;
   } catch (error) {
     throw handleError(error, "Failed to fetch transactions!");

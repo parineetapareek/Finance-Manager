@@ -79,7 +79,7 @@ button {
     border: none;
     cursor: pointer;
     transition: 0.3s ease-in-out;
-    margin-top: 5px;
+    margin: 5px;
     padding: 5px;
     border-radius: 7px;
 }
@@ -126,7 +126,7 @@ select:focus {
     padding: 12px;
     font-size: medium;
     font-weight: 700;
-    background-color: #9C27B0;
+    background-color: rgb(190, 34, 218);
     color: white;
     border: none;
     border-radius: 5px;

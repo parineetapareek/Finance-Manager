@@ -6,12 +6,6 @@ export const addTransaction = async (req, res) => {
     console.log("Requested User: ", req.user);
     console.log("userId: ", req.user.userId);
 
-    const { tranType, category, amount, date, description, accountId, source } =
-      req.body;
-
-    console.log("req.body: ", req.body);
-    console.log("accountId: ", accountId);
-
     if (!req.user || !req.user.userId) {
       return res.status(401).json({
         success: false,
@@ -19,10 +13,23 @@ export const addTransaction = async (req, res) => {
       });
     }
 
+    const { tranType, category, amount, date, description, accountId, source } =
+      req.body;
+
+    console.log("req.body: ", req.body);
+    console.log("accountId: ", accountId);
+
     if (!tranType || !category || !amount || !date || !accountId) {
       return res
         .status(400)
         .json({ success: false, message: "All Fields are Required!" });
+    }
+
+    if (tranType === "Income" && !source) {
+      return res.status(400).json({
+        success: false,
+        message: "Source is required for Income transaction",
+      });
     }
 
     // Validate amount is a positive number
@@ -35,7 +42,6 @@ export const addTransaction = async (req, res) => {
     // Validate Date Format
     const parsedDate = new Date(date);
     if (isNaN(parsedDate.getTime())) {
-      // Check if the date is invalid
       return res
         .status(400)
         .json({ success: false, message: "Invalid Date Format!" });
@@ -57,7 +63,6 @@ export const addTransaction = async (req, res) => {
         .json({ success: false, message: "Account not found!" });
     }
 
-    // Ensure account.balance is a valid number
     console.log("Account Balance: ", account.bankBalance);
 
     // Adjust balance based on transaction type
@@ -84,7 +89,7 @@ export const addTransaction = async (req, res) => {
       date: parsedDate,
       description,
       accountId,
-      source: tranType === "Income" ? source : undefined,
+      source: tranType === "Income" ? source : null,
       balanceAfterTransaction: account.bankBalance,
     });
 
@@ -221,6 +226,13 @@ export const updateTransaction = async (req, res) => {
           .status(400)
           .json({ success: false, message: "Date cannot be in the future!" });
       }
+    }
+
+    if (tranType === "Income" && !source) {
+      return res.status(400).json({
+        success: false,
+        message: "Source is required for Income transaction",
+      });
     }
 
     // Get the old account

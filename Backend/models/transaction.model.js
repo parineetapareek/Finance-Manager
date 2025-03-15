@@ -33,13 +33,15 @@ const transactionSchema = new mongoose.Schema(
     },
     description: {
       type: String,
-      default: "",
+      default: null,
     },
     source: {
       type: String,
+      default: null,
     },
     balanceAfterTransaction: {
       type: Number,
+      min: 0,
     },
   },
   { timestamps: true }
