@@ -12,10 +12,12 @@ import {
 import { getAuthUser } from "../services/AuthService";
 import "../styles/account.css";
 import { getAccountsByUser } from "../services/AccountService";
+import { getBudget } from "../services/BudgetService";
 
 function Transactions() {
   const [transactions, setTransactions] = useState([]);
   const [accounts, setAccounts] = useState([]);
+  const [budgets, setBudgets] = useState([]);
   const [editingTransaction, setEditingTransaction] = useState(null);
   const [newTransaction, setNewTransaction] = useState({
     category: "",
@@ -24,6 +26,8 @@ function Transactions() {
     date: "",
     description: "",
     accountId: "",
+    source: "",
+    budgetAllocation: "",
   });
   const [userId, setUserId] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -43,9 +47,24 @@ function Transactions() {
         console.log("accountData: ", accountData);
         console.log("accountData.accounts: ", accountData.account);
         setAccounts(accountData.account);
+
+        const budgetData = await getBudget(user.user._id);
+        console.log("budgetData: ", budgetData);
+        console.log("budgetData.budget: ", budgetData.budget);
+        console.log(
+          "budgetData.budget.allocations: ",
+          budgetData.budget.allocations
+        );
+
+        setBudgets(budgetData.budget);
       } catch (error) {
-        console.error("Error fetching user ID or accounts:", error.message);
-        setError("Failed to fetch user ID or accounts. Please try again.");
+        console.error(
+          "Error fetching user ID , accounts or budget:",
+          error.message
+        );
+        setError(
+          "Failed to fetch user ID, accounts or budget. Please try again."
+        );
       }
     };
     fetchUserIdAndAccounts();
@@ -106,6 +125,8 @@ function Transactions() {
         date: "",
         description: "",
         accountId: "",
+        source: "",
+        budgetAllocation: "",
       });
       setEditingTransaction(null);
       fetchTransactions();
@@ -128,6 +149,8 @@ function Transactions() {
       date: new Date(transaction.date).toISOString().split("T")[0], // Format date for input
       description: transaction.description,
       accountId: transaction.accountId,
+      source: transaction.source || "",
+      budgetAllocation: transaction.budgetAllocation || "",
     });
   };
 
@@ -141,6 +164,8 @@ function Transactions() {
       date: "",
       description: "",
       accountId: "",
+      source: "",
+      budgetAllocation: "",
     });
   };
 
@@ -310,6 +335,7 @@ function Transactions() {
               />
               <label>Type</label>
               <select
+                className="myDropDown"
                 value={newTransaction.tranType}
                 onChange={(e) =>
                   setNewTransaction({
@@ -321,6 +347,50 @@ function Transactions() {
                 <option value="Income">Income</option>
                 <option value="Expense">Expense</option>
               </select>
+
+              {newTransaction.tranType === "Income" && (
+                <>
+                  <label>Source</label>
+                  <input
+                    type="text"
+                    value={newTransaction.source}
+                    onChange={(e) =>
+                      setNewTransaction({
+                        ...newTransaction,
+                        source: e.target.value,
+                      })
+                    }
+                    required
+                  />
+                </>
+              )}
+
+              {newTransaction.tranType === "Expense" &&
+                budgets?.allocations && (
+                  <>
+                    <label>Budget Allocation</label>
+                    <select
+                      value={newTransaction.budgetAllocation}
+                      onChange={(e) =>
+                        setNewTransaction({
+                          ...newTransaction,
+                          budgetAllocation: e.target.value,
+                        })
+                      }
+                      required
+                    >
+                      <option value="">Select a budget category</option>
+                      {Object.entries(budgets.allocations).map(
+                        ([category, amount]) => (
+                          <option key={category} value={category}>
+                            {category}
+                          </option>
+                        )
+                      )}
+                    </select>
+                  </>
+                )}
+
               <label>Date</label>
               <input
                 type="date"

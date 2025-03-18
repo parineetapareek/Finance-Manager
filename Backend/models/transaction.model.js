@@ -12,6 +12,11 @@ const transactionSchema = new mongoose.Schema(
       ref: "Account",
       required: true,
     },
+    budgetId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Budget",
+      default: null,
+    },
     tranType: {
       type: String,
       enum: ["Income", "Expense"],
@@ -42,6 +47,10 @@ const transactionSchema = new mongoose.Schema(
     balanceAfterTransaction: {
       type: Number,
       min: 0,
+    },
+    budgetAllocation: {
+      type: String,
+      default: null,
     },
   },
   { timestamps: true }

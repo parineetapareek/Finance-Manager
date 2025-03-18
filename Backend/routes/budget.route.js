@@ -1,20 +1,17 @@
-// import express from "express";
-// import {
-//   createBudget,
-//   deleteBudget,
-//   getBudgetById,
-//   getBudgets,
-//   toggleLockBudget,
-//   updateBudget,
-// } from "../controllers/budget.controller.js";
+import express from "express";
+import {
+  createBudget,
+  deleteBudget,
+  getBudget,
+  updateBudget,
+} from "../controllers/budget.controller.js";
+import { verifyToken } from "../middlewares/auth.middleware.js";
 
-// const budgetRouter = express.Router();
+const budgetRouter = express.Router();
 
-// router.post("/create", createBudget);
-// router.get("/userBudget/:userId", getBudgets);
-// router.get("/budget/:id", getBudgetById);
-// router.put("/update/:id", updateBudget);
-// router.delete("/delete/:id", deleteBudget);
-// router.put("/lock/:id", toggleLockBudget);
+budgetRouter.post("/create", verifyToken, createBudget);
+budgetRouter.get("/get", verifyToken, getBudget);
+budgetRouter.put("/update", verifyToken, updateBudget);
+budgetRouter.delete("/del", verifyToken, deleteBudget);
 
-// export default budgetRouter;
+export default budgetRouter;

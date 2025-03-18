@@ -1,4 +1,5 @@
 import Account from "../models/account.model.js";
+import Budget from "../models/budget.model.js";
 import Transaction from "../models/transaction.model.js";
 
 export const addTransaction = async (req, res) => {
@@ -13,8 +14,16 @@ export const addTransaction = async (req, res) => {
       });
     }
 
-    const { tranType, category, amount, date, description, accountId, source } =
-      req.body;
+    const {
+      tranType,
+      category,
+      amount,
+      date,
+      description,
+      accountId,
+      source,
+      budgetAllocation,
+    } = req.body;
 
     console.log("req.body: ", req.body);
     console.log("accountId: ", accountId);
@@ -30,6 +39,44 @@ export const addTransaction = async (req, res) => {
         success: false,
         message: "Source is required for Income transaction",
       });
+    }
+
+    let budgetId = null;
+    if (tranType === "Expense") {
+      const budget = await Budget.findOne({ userId: req.user.userId });
+
+      console.log("budget: ", budget);
+      console.log("budget.remainingBudget: ", budget.remainingBudget);
+      console.log("budgetAllocation: ", budgetAllocation);
+
+      if (budget) {
+        if (!budgetAllocation) {
+          return res
+            .status(400)
+            .json({ success: false, message: "Budget Allocation Required!" });
+        }
+
+        if (!budget.remainingBudget.has(budgetAllocation)) {
+          return res
+            .status(400)
+            .json({ success: false, message: "Invalid budget allocation!" });
+        }
+
+        const allocationAmount = budget.remainingBudget.get(budgetAllocation);
+        console.log("allocationAmount: ", allocationAmount);
+
+        // Deduct the spent amount from the allocation
+        budget.remainingBudget.set(budgetAllocation, allocationAmount - amount);
+        // budget.remainingBudget -= amount;
+
+        await budget.save();
+        console.log(
+          `Budget updated: ${amount} deducted from ${budgetAllocation} allocation.`
+        );
+
+        // Set the budgetAllocationId to the budget's _id
+        budgetId = budget._id;
+      }
     }
 
     // Validate amount is a positive number
@@ -91,6 +138,8 @@ export const addTransaction = async (req, res) => {
       accountId,
       source: tranType === "Income" ? source : null,
       balanceAfterTransaction: account.bankBalance,
+      budgetId,
+      budgetAllocation: tranType === "Expense" ? budgetAllocation : null,
     });
 
     const savedTransaction = await newTransaction.save();
@@ -185,8 +234,16 @@ export const updateTransaction = async (req, res) => {
     console.log("Transaction ID: ", req.params.id);
     console.log("Requested Body: ", req.body);
 
-    const { tranType, category, amount, date, description, accountId, source } =
-      req.body;
+    const {
+      tranType,
+      category,
+      amount,
+      date,
+      description,
+      accountId,
+      source,
+      budgetAllocation,
+    } = req.body;
 
     let transaction = await Transaction.findById(req.params.id);
 
@@ -235,6 +292,34 @@ export const updateTransaction = async (req, res) => {
       });
     }
 
+    const budget = await Budget.findOne({ userId: req.user.userId });
+    console.log("budget: ", budget);
+
+    if (transaction.tranType === "Expense" && budget) {
+      console.log("Before Update Budget: ", budget);
+      console.log(
+        "Before Update Budget.remainingBudget: ",
+        budget.remainingBudget
+      );
+      console.log(
+        "Before Update transaction.budgetAllocation: ",
+        transaction.budgetAllocation
+      );
+      console.log("Before Update transaction: ", transaction);
+
+      if (budget.remainingBudget.has(transaction.budgetAllocation)) {
+        budget.remainingBudget.set(
+          transaction.budgetAllocation,
+          budget.remainingBudget.get(transaction.budgetAllocation) +
+            transaction.amount
+        );
+
+        // budget.remainingBudget += transaction.amount;
+        await budget.save();
+        console.log("budget after revert: ", budget);
+      }
+    }
+
     // Get the old account
     const oldAccount = await Account.findById(transaction.accountId);
     if (!oldAccount) {
@@ -265,6 +350,34 @@ export const updateTransaction = async (req, res) => {
     const newAmount = amount !== undefined ? amount : transaction.amount;
     const newTranType = tranType || transaction.tranType;
 
+    // Apply new transaction impact on budget (if it's an expense)
+    if (newTranType === "Expense" && budget) {
+      if (!budgetAllocation) {
+        return res.status(400).json({
+          success: false,
+          message:
+            "Budget allocation category is required for expense transactions!",
+        });
+      }
+
+      if (!budget.remainingBudget.has(budgetAllocation)) {
+        return res.status(400).json({
+          success: false,
+          message: `No budget allocation found for category: ${budgetAllocation}`,
+        });
+      }
+
+      // Deduct the amount from the budget allocation
+      const allocationAmount = budget.remainingBudget.get(budgetAllocation);
+
+      budget.remainingBudget.set(
+        budgetAllocation,
+        allocationAmount - newAmount
+      );
+      // budget.remainingBudget -= newAmount;
+      await budget.save();
+    }
+
     // Apply new transaction impact
     if (newTranType === "Income") {
       newAccount.bankBalance += newAmount;
@@ -286,6 +399,9 @@ export const updateTransaction = async (req, res) => {
     transaction.accountId = accountId || transaction.accountId;
     transaction.source = newTranType === "Income" ? source : transaction.source;
     transaction.balanceAfterTransaction = newAccount.bankBalance;
+    transaction.budgetId = newTranType === "Expense" ? budget._id : null;
+    transaction.budgetAllocation =
+      newTranType === "Expense" ? budgetAllocation : null;
 
     await transaction.save();
     await oldAccount.save(); // Save old account changes
@@ -325,6 +441,23 @@ export const deleteTransaction = async (req, res) => {
       return res
         .status(404)
         .json({ success: false, message: "Associated account not found!" });
+    }
+
+    // Revert budget impact if the transaction was an expense
+    if (transaction.tranType === "Expense" && transaction.budgetId) {
+      const budget = await Budget.findById(transaction.budgetId);
+
+      if (budget) {
+        if (budget.allocations.has(transaction.budgetAllocation)) {
+          budget.allocations.set(
+            transaction.budgetAllocation,
+            budget.allocations.get(transaction.budgetAllocation) +
+              transaction.amount
+          );
+          budget.remainingBudget += transaction.amount;
+          await budget.save();
+        }
+      }
     }
 
     // Revert balance
@@ -388,6 +521,21 @@ export const deleteMultipleTransactions = async (req, res) => {
         account.bankBalance += transaction.amount;
       }
       await account.save();
+
+      // Revert budget impact for expense transactions
+      if (transaction.tranType === "Expense" && transaction.budgetId) {
+        const budget = await Budget.findById(transaction.budgetId);
+        if (budget && budget.allocations.has(transaction.budgetAllocation)) {
+          // Revert the amount to the budget allocation
+          budget.allocations.set(
+            transaction.budgetAllocation,
+            budget.allocations.get(transaction.budgetAllocation) +
+              transaction.amount
+          );
+          budget.remainingBudget += transaction.amount;
+          await budget.save();
+        }
+      }
     }
 
     // Delete transactions that belong to the authenticated user

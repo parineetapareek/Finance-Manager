@@ -1,5 +1,5 @@
 .accMain,
-.transacMain {
+.transacMain, .mainBudget {
     display: flex;
     min-height: 100vh;
     gap: 20px;
@@ -7,7 +7,7 @@
 }
 
 .accContent,
-.transacContent {
+.transacContent , .budgetContainer{
     display: flex;
     flex: 3;
     gap: 20px;
@@ -16,7 +16,7 @@
 }
 
 .createAcc,
-.addTransaction {
+.addTransaction, .addBudget {
     background: white;
     padding: 30px;
     border-radius: 25px;
@@ -27,7 +27,7 @@
 }
 
 .accInfo,
-.tranInfo {
+.tranInfo, .budgetInfo {
     flex: 2;
     background: white;
     padding: 20px;
@@ -121,8 +121,18 @@ select:focus {
     border-bottom: 2px solid #FFB300;
 }
 
+.myDropDown{
+   background: transparent;
+   appearance: none;
+}
+
+.myDropDown option:hover{
+    background-color:#AB47BC;
+    border: none;
+}
+
 .createAcc button,
-.addTransaction button {
+.addTransaction button, .addBudget button {
     padding: 12px;
     font-size: medium;
     font-weight: 700;
@@ -135,13 +145,13 @@ select:focus {
 }
 
 .createAcc button:hover,
-.addTransaction button:hover {
+.addTransaction button:hover , .addBudget button:hover{
     background-color: #7B1FA2;
 }
 
 /* Error Messages */
 .createAcc .error,
-.addTransaction .error {
+.addTransaction .error, .addBudget .error {
     color: red;
     font-size: 0.8rem;
     margin-top: -10px;
@@ -178,7 +188,7 @@ input[type="checkbox"] {
 @media (max-width: 768px) {
 
     .accContent,
-    .transacContent {
+    .transacContent, .budgetContainer {
         flex-direction: column;
         align-items: center;
     }
@@ -186,7 +196,7 @@ input[type="checkbox"] {
     .accInfo,
     .createAcc,
     .tranInfo,
-    .addTransaction {
+    .addTransaction, .addBudget, .budgetInfo {
         width: 100%;
     }
 }
