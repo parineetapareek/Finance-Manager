@@ -2,4 +2,4 @@
 *.env
 
 # Optional: ensure node_modules are ignored too
-node_modules/
+**/node_modules/
