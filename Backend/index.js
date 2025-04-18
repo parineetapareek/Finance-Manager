@@ -8,6 +8,7 @@ import authRoute from "./routes/auth.route.js";
 import tranRouter from "./routes/transaction.route.js";
 import accountRouter from "./routes/account.route.js";
 import budgetRouter from "./routes/budget.route.js";
+import savingsRouter from "./routes/saving.route.js";
 
 dotenv.config();
 
@@ -33,6 +34,7 @@ app.use("/auth", authRoute);
 app.use("/transaction", tranRouter);
 app.use("/account", accountRouter);
 app.use("/budget", budgetRouter);
+app.use("/savings", savingsRouter);
 
 // Start Server
 app.listen(port, () => {

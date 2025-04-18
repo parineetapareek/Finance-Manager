@@ -24,12 +24,12 @@ function SideNav() {
             <Link to="/transaction">Transactions</Link>
           </li>
           <li>
-            <img src="moneybag.svg" />
-            <Link to="/savings">Savings</Link>
-          </li>
-          <li>
             <img src="budget.svg" />
             <Link to="/budget">Budget</Link>
+          </li>
+          <li>
+            <img src="moneybag.svg" />
+            <Link to="/savings">Savings</Link>
           </li>
           <li>
             <img src="investment.svg" />
